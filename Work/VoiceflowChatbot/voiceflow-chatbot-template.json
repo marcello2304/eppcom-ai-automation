@@ -1,0 +1,844 @@
+{
+  "version": "6",
+  "id": "eppcom-chatbot-template",
+  "name": "EPPCOM Solutions Chatbot",
+  "events": [
+    {
+      "id": "evt-start-001",
+      "type": "start",
+      "graphCoordinates": { "x": 0, "y": 200 },
+      "outgoingEdgeId": "edge-start-to-welcome"
+    }
+  ],
+  "groups": [
+    {
+      "id": "grp-welcome",
+      "title": "Willkommen",
+      "graphCoordinates": { "x": 400, "y": 100 },
+      "blocks": [
+        {
+          "id": "blk-w1",
+          "groupId": "grp-welcome",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Hallo! Willkommen bei ", "bold": true },
+                  { "text": "EPPCOM Solutions", "bold": true },
+                  { "text": " - Ihrem Partner fuer KI-Automatisierung.", "bold": true }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-w2",
+          "groupId": "grp-welcome",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Ich bin Ihr digitaler Assistent und helfe Ihnen gerne weiter. Wie darf ich Sie ansprechen?" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-w3",
+          "groupId": "grp-welcome",
+          "type": "text input",
+          "outgoingEdgeId": "edge-welcome-to-menu",
+          "options": {
+            "labels": {
+              "placeholder": "Ihr Name...",
+              "button": "Weiter"
+            },
+            "variableId": "var-name",
+            "isLong": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-menu",
+      "title": "Hauptmenue",
+      "graphCoordinates": { "x": 800, "y": 100 },
+      "blocks": [
+        {
+          "id": "blk-m1",
+          "groupId": "grp-menu",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Freut mich, " },
+                  { "text": "{{name}}", "bold": true },
+                  { "text": "! Wie kann ich Ihnen heute helfen?" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-m2",
+          "groupId": "grp-menu",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "itm-m-services",
+              "blockId": "blk-m2",
+              "content": "Unsere Services",
+              "outgoingEdgeId": "edge-menu-to-services"
+            },
+            {
+              "id": "itm-m-faq",
+              "blockId": "blk-m2",
+              "content": "Preise & Pakete",
+              "outgoingEdgeId": "edge-menu-to-faq"
+            },
+            {
+              "id": "itm-m-ai",
+              "blockId": "blk-m2",
+              "content": "KI-Assistent fragen",
+              "outgoingEdgeId": "edge-menu-to-ai"
+            },
+            {
+              "id": "itm-m-contact",
+              "blockId": "blk-m2",
+              "content": "Kontakt & Termin",
+              "outgoingEdgeId": "edge-menu-to-contact"
+            }
+          ],
+          "options": {
+            "isMultipleChoice": false,
+            "buttonLabel": "Senden",
+            "searchInputPlaceholder": "Optionen filtern...",
+            "isSearchable": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-services",
+      "title": "Unsere Services",
+      "graphCoordinates": { "x": 1250, "y": -500 },
+      "blocks": [
+        {
+          "id": "blk-s1",
+          "groupId": "grp-services",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Unsere Services im Ueberblick:", "bold": true }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-s2",
+          "groupId": "grp-services",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "1. Workflow-Automatisierung", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Automatisierung von E-Mail-Management, Rechnungsverarbeitung, Freigaben und Reporting. Bis zu 60% weniger Bueroarbeit in 2-6 Wochen. Ab 158 EUR/Monat." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "2. KI-Chatbots", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "24/7 verfuegbar auf Web, WhatsApp, Telegram und Sprache. Lead-Qualifizierung und CRM-Integration. Ab 133 EUR/Monat." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "3. KI-Strategie & Schulungen", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "6-Wochen-Potenzialanalyse bis zur Implementierungs-Roadmap. Governance, Datensicherheit, EU AI Act Compliance. Ab 1.290 EUR." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "4. KI-Webdesign & Marketing", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "SEO/SEA-Cluster, Landing Pages, Content-Automatisierung, A/B-Testing und Chatbot-gestuetzte Lead-Qualifizierung. Ab 150 EUR/Monat." }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-s3",
+          "groupId": "grp-services",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Uebrigens: Bis zu 50% staatliche Foerderung moeglich! Wir unterstuetzen Sie bei der Antragstellung." }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-s4",
+          "groupId": "grp-services",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "itm-s-ai",
+              "blockId": "blk-s4",
+              "content": "KI-Assistent fragen",
+              "outgoingEdgeId": "edge-services-to-ai"
+            },
+            {
+              "id": "itm-s-contact",
+              "blockId": "blk-s4",
+              "content": "Beratung anfragen",
+              "outgoingEdgeId": "edge-services-to-contact"
+            },
+            {
+              "id": "itm-s-back",
+              "blockId": "blk-s4",
+              "content": "Zurueck zum Menue",
+              "outgoingEdgeId": "edge-services-to-menu"
+            }
+          ],
+          "options": {
+            "isMultipleChoice": false,
+            "buttonLabel": "Senden",
+            "isSearchable": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-faq",
+      "title": "Preise & Pakete",
+      "graphCoordinates": { "x": 1250, "y": -100 },
+      "blocks": [
+        {
+          "id": "blk-f1",
+          "groupId": "grp-faq",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Preise & Pakete", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Workflow-Automatisierung:", "bold": true },
+                  { "text": " ab 1.900 EUR (Setup) + ab 158 EUR/Monat" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "KI-Chatbots:", "bold": true },
+                  { "text": " ab 1.600 EUR (Setup) + ab 133 EUR/Monat" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "KI-Webdesign & Marketing:", "bold": true },
+                  { "text": " ab 1.500 EUR (Setup) + ab 150 EUR/Monat" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "KI-Strategie & Schulungen:", "bold": true },
+                  { "text": " ab 1.290 EUR (Halbtag) bis 2.190 EUR (Ganztag)" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Kostenlose Erstberatung (30 Min.) - KI-Potenzialanalyse: 490 EUR (wird bei Beauftragung angerechnet)." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Alle Preise zzgl. MwSt. Bis zu 50% staatliche Foerderung moeglich!" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-f2",
+          "groupId": "grp-faq",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "itm-f-ai",
+              "blockId": "blk-f2",
+              "content": "KI-Assistent fragen",
+              "outgoingEdgeId": "edge-faq-to-ai"
+            },
+            {
+              "id": "itm-f-contact",
+              "blockId": "blk-f2",
+              "content": "Angebot anfragen",
+              "outgoingEdgeId": "edge-faq-to-contact"
+            },
+            {
+              "id": "itm-f-back",
+              "blockId": "blk-f2",
+              "content": "Zurueck zum Menue",
+              "outgoingEdgeId": "edge-faq-to-menu"
+            }
+          ],
+          "options": {
+            "isMultipleChoice": false,
+            "buttonLabel": "Senden",
+            "isSearchable": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-ai",
+      "title": "KI-Assistent",
+      "graphCoordinates": { "x": 1250, "y": 250 },
+      "blocks": [
+        {
+          "id": "blk-ai1",
+          "groupId": "grp-ai",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "KI-Assistent", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Stellen Sie mir eine beliebige Frage zu unseren Services, KI-Automatisierung oder Ihrem konkreten Anwendungsfall. Ich helfe Ihnen gerne weiter!" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-ai2",
+          "groupId": "grp-ai",
+          "type": "text input",
+          "options": {
+            "labels": {
+              "placeholder": "Ihre Frage an den KI-Assistenten...",
+              "button": "Frage senden"
+            },
+            "variableId": "var-frage",
+            "isLong": true
+          }
+        },
+        {
+          "id": "blk-ai3",
+          "groupId": "grp-ai",
+          "type": "OpenAI",
+          "options": {
+            "task": "Create chat completion",
+            "model": "gpt-4o-mini",
+            "messages": [
+              {
+                "role": "system",
+                "content": "Du bist der freundliche KI-Assistent von EPPCOM Solutions (eppcom.de) in Reutlingen. Inhaber ist Marcel Eppler. EPPCOM ist spezialisiert auf KI-Automatisierung fuer KMU.\n\nServices:\n- Workflow-Automatisierung (E-Mail, Rechnungen, Freigaben, Reporting) ab 158 EUR/Monat, Setup ab 1.900 EUR\n- KI-Chatbots (Web, WhatsApp, Telegram, Sprache, CRM-Integration) ab 133 EUR/Monat, Setup ab 1.600 EUR\n- KI-Strategie & Schulungen (Potenzialanalyse, Roadmap, EU AI Act, Governance) ab 1.290 EUR\n- KI-Webdesign & Marketing (SEO/SEA, Landing Pages, A/B-Testing) ab 150 EUR/Monat, Setup ab 1.500 EUR\n\nWichtige Fakten:\n- Bis zu 50% staatliche Foerderung moeglich\n- DSGVO- und EU AI Act-konform\n- Erste Automatisierungen in 2-4 Wochen\n- Bis zu 60% weniger Bueroarbeit\n- Kostenlose Erstberatung (30 Min.)\n- KI-Potenzialanalyse: 490 EUR (wird bei Beauftragung angerechnet)\n- Laufender Support: 690 EUR/Monat\n- Kontakt: kontakt@eppcom.de, Tel. +49 157 53640191\n- Adresse: Ulrichstrasse 3, 72764 Reutlingen\n- Oeffnungszeiten: Mo-Fr 9-17 Uhr\n\nAntworte immer auf Deutsch, freundlich und kompetent. Halte Antworten kurz und praegnant (max. 3-4 Saetze). Bei konkreten Projektanfragen empfiehl die kostenlose Erstberatung."
+              },
+              {
+                "role": "user",
+                "content": "{{frage}}"
+              }
+            ],
+            "responseMapping": [
+              {
+                "valueToExtract": "Message content",
+                "variableId": "var-ai-antwort"
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-ai4",
+          "groupId": "grp-ai",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "{{ai_antwort}}" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-ai5",
+          "groupId": "grp-ai",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "itm-ai-again",
+              "blockId": "blk-ai5",
+              "content": "Weitere Frage stellen",
+              "outgoingEdgeId": "edge-ai-to-ai"
+            },
+            {
+              "id": "itm-ai-contact",
+              "blockId": "blk-ai5",
+              "content": "Beratung anfragen",
+              "outgoingEdgeId": "edge-ai-to-contact"
+            },
+            {
+              "id": "itm-ai-back",
+              "blockId": "blk-ai5",
+              "content": "Zurueck zum Menue",
+              "outgoingEdgeId": "edge-ai-to-menu"
+            }
+          ],
+          "options": {
+            "isMultipleChoice": false,
+            "buttonLabel": "Senden",
+            "isSearchable": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-contact",
+      "title": "Kontakt & Termin",
+      "graphCoordinates": { "x": 1250, "y": 600 },
+      "blocks": [
+        {
+          "id": "blk-c1",
+          "groupId": "grp-contact",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Kontakt & Termin", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Gerne nehme ich Ihre Kontaktdaten auf fuer eine kostenlose Erstberatung (30 Min.) mit Marcel Eppler." }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-c2",
+          "groupId": "grp-contact",
+          "type": "email input",
+          "options": {
+            "labels": {
+              "placeholder": "ihre@email.de",
+              "button": "Weiter"
+            },
+            "variableId": "var-email",
+            "retryMessageContent": "Bitte geben Sie eine gueltige E-Mail-Adresse ein."
+          }
+        },
+        {
+          "id": "blk-c3",
+          "groupId": "grp-contact",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Vielen Dank! Beschreiben Sie kurz Ihr Anliegen oder Ihren Automatisierungswunsch:" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-c4",
+          "groupId": "grp-contact",
+          "type": "text input",
+          "options": {
+            "labels": {
+              "placeholder": "z.B. Wir moechten unsere Rechnungsverarbeitung automatisieren...",
+              "button": "Absenden"
+            },
+            "variableId": "var-message",
+            "isLong": true
+          }
+        },
+        {
+          "id": "blk-c5",
+          "groupId": "grp-contact",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Vielen Dank, {{name}}!", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Wir haben Ihre Anfrage erhalten und Marcel Eppler meldet sich schnellstmoeglich bei Ihnen unter {{email}}." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Sie erreichen uns auch direkt:" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Tel: +49 157 53640191" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "E-Mail: kontakt@eppcom.de" }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Mo-Fr 9:00-17:00 Uhr" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-c6",
+          "groupId": "grp-contact",
+          "type": "choice input",
+          "items": [
+            {
+              "id": "itm-c-back",
+              "blockId": "blk-c6",
+              "content": "Zurueck zum Menue",
+              "outgoingEdgeId": "edge-contact-to-menu"
+            },
+            {
+              "id": "itm-c-bye",
+              "blockId": "blk-c6",
+              "content": "Gespraech beenden",
+              "outgoingEdgeId": "edge-contact-to-goodbye"
+            }
+          ],
+          "options": {
+            "isMultipleChoice": false,
+            "buttonLabel": "Senden",
+            "isSearchable": false
+          }
+        }
+      ]
+    },
+    {
+      "id": "grp-goodbye",
+      "title": "Verabschiedung",
+      "graphCoordinates": { "x": 1700, "y": 600 },
+      "blocks": [
+        {
+          "id": "blk-g1",
+          "groupId": "grp-goodbye",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Vielen Dank fuer Ihr Interesse, {{name}}!", "bold": true }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Bei EPPCOM Solutions sind wir jederzeit fuer Sie da. Besuchen Sie uns auf eppcom.de oder rufen Sie uns an unter +49 157 53640191." }
+                ]
+              },
+              {
+                "type": "p",
+                "children": [{ "text": "" }]
+              },
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Bis bald und einen schoenen Tag!" }
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    }
+  ],
+  "edges": [
+    {
+      "id": "edge-start-to-welcome",
+      "from": { "eventId": "evt-start-001" },
+      "to": { "groupId": "grp-welcome" }
+    },
+    {
+      "id": "edge-welcome-to-menu",
+      "from": { "blockId": "blk-w3", "groupId": "grp-welcome" },
+      "to": { "groupId": "grp-menu" }
+    },
+    {
+      "id": "edge-menu-to-services",
+      "from": { "blockId": "blk-m2", "groupId": "grp-menu", "itemId": "itm-m-services" },
+      "to": { "groupId": "grp-services" }
+    },
+    {
+      "id": "edge-menu-to-faq",
+      "from": { "blockId": "blk-m2", "groupId": "grp-menu", "itemId": "itm-m-faq" },
+      "to": { "groupId": "grp-faq" }
+    },
+    {
+      "id": "edge-menu-to-ai",
+      "from": { "blockId": "blk-m2", "groupId": "grp-menu", "itemId": "itm-m-ai" },
+      "to": { "groupId": "grp-ai" }
+    },
+    {
+      "id": "edge-menu-to-contact",
+      "from": { "blockId": "blk-m2", "groupId": "grp-menu", "itemId": "itm-m-contact" },
+      "to": { "groupId": "grp-contact" }
+    },
+    {
+      "id": "edge-services-to-ai",
+      "from": { "blockId": "blk-s4", "groupId": "grp-services", "itemId": "itm-s-ai" },
+      "to": { "groupId": "grp-ai" }
+    },
+    {
+      "id": "edge-services-to-contact",
+      "from": { "blockId": "blk-s4", "groupId": "grp-services", "itemId": "itm-s-contact" },
+      "to": { "groupId": "grp-contact" }
+    },
+    {
+      "id": "edge-services-to-menu",
+      "from": { "blockId": "blk-s4", "groupId": "grp-services", "itemId": "itm-s-back" },
+      "to": { "groupId": "grp-menu" }
+    },
+    {
+      "id": "edge-faq-to-ai",
+      "from": { "blockId": "blk-f2", "groupId": "grp-faq", "itemId": "itm-f-ai" },
+      "to": { "groupId": "grp-ai" }
+    },
+    {
+      "id": "edge-faq-to-contact",
+      "from": { "blockId": "blk-f2", "groupId": "grp-faq", "itemId": "itm-f-contact" },
+      "to": { "groupId": "grp-contact" }
+    },
+    {
+      "id": "edge-faq-to-menu",
+      "from": { "blockId": "blk-f2", "groupId": "grp-faq", "itemId": "itm-f-back" },
+      "to": { "groupId": "grp-menu" }
+    },
+    {
+      "id": "edge-ai-to-ai",
+      "from": { "blockId": "blk-ai5", "groupId": "grp-ai", "itemId": "itm-ai-again" },
+      "to": { "groupId": "grp-ai" }
+    },
+    {
+      "id": "edge-ai-to-contact",
+      "from": { "blockId": "blk-ai5", "groupId": "grp-ai", "itemId": "itm-ai-contact" },
+      "to": { "groupId": "grp-contact" }
+    },
+    {
+      "id": "edge-ai-to-menu",
+      "from": { "blockId": "blk-ai5", "groupId": "grp-ai", "itemId": "itm-ai-back" },
+      "to": { "groupId": "grp-menu" }
+    },
+    {
+      "id": "edge-contact-to-menu",
+      "from": { "blockId": "blk-c6", "groupId": "grp-contact", "itemId": "itm-c-back" },
+      "to": { "groupId": "grp-menu" }
+    },
+    {
+      "id": "edge-contact-to-goodbye",
+      "from": { "blockId": "blk-c6", "groupId": "grp-contact", "itemId": "itm-c-bye" },
+      "to": { "groupId": "grp-goodbye" }
+    }
+  ],
+  "variables": [
+    {
+      "id": "var-name",
+      "name": "name",
+      "isSessionVariable": true
+    },
+    {
+      "id": "var-email",
+      "name": "email",
+      "isSessionVariable": true
+    },
+    {
+      "id": "var-message",
+      "name": "nachricht",
+      "isSessionVariable": true
+    },
+    {
+      "id": "var-frage",
+      "name": "frage",
+      "isSessionVariable": true
+    },
+    {
+      "id": "var-ai-antwort",
+      "name": "ai_antwort",
+      "isSessionVariable": true
+    }
+  ],
+  "theme": {
+    "general": {
+      "font": "Open Sans",
+      "background": {
+        "type": "Color",
+        "content": "#ffffff"
+      }
+    },
+    "chat": {
+      "hostBubbles": {
+        "backgroundColor": "#F0F4FF",
+        "color": "#1E293B"
+      },
+      "guestBubbles": {
+        "backgroundColor": "#2563EB",
+        "color": "#ffffff"
+      },
+      "buttons": {
+        "backgroundColor": "#2563EB",
+        "color": "#ffffff"
+      },
+      "inputs": {
+        "backgroundColor": "#ffffff",
+        "color": "#1E293B",
+        "placeholderColor": "#9CA3AF"
+      },
+      "roundness": "large"
+    }
+  },
+  "settings": {
+    "general": {
+      "isBrandingEnabled": true,
+      "isTypingEmulationEnabled": true,
+      "isInputPrefillEnabled": true,
+      "rememberUser": {
+        "isEnabled": false
+      }
+    },
+    "typingEmulation": {
+      "enabled": true,
+      "speed": 300,
+      "maxDelay": 1.5
+    },
+    "metadata": {
+      "title": "EPPCOM Solutions - KI-Assistent",
+      "description": "Ihr digitaler Assistent fuer KI-Automatisierung - EPPCOM Solutions, Reutlingen",
+      "imageUrl": ""
+    }
+  },
+  "selectedThemeTemplateId": null,
+  "publicId": null,
+  "folderId": null,
+  "icon": null,
+  "customDomain": null
+}

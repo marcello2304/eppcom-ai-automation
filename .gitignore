@@ -1,0 +1,16 @@
+# Sensible Daten
+.env
+.env.*
+*.pem
+*.key
+secrets/
+credentials/
+
+# Claude Code
+.claude/settings.local.json
+
+# Chat-History
+chat-history.md
+
+# macOS
+.DS_Store
