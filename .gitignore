@@ -3,8 +3,21 @@
 .env.*
 *.pem
 *.key
+*.p12
+*.pfx
+*.cert
+*.crt
 secrets/
 credentials/
+*.secret
+**/config.yaml
+!.gitignore
+
+# API Keys & Tokens
+.anthropic
+.openai
+.api_key*
+token.json
 
 # Claude Code
 .claude/settings.local.json
@@ -12,5 +25,16 @@ credentials/
 # Chat-History
 chat-history.md
 
+# SSH
+id_rsa*
+id_ed25519*
+known_hosts
+
 # macOS
 .DS_Store
+
+# Node
+node_modules/
+
+# Logs
+*.log

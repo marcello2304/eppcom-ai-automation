@@ -36,6 +36,10 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
   - `n8n` – Workflow-Automatisierung
   - `typebot-builder` – Admin-Interface → admin-bot.eppcom.de
   - `typebot-viewer` – Public Widget → bot.eppcom.de
+  - `code-server` v4.111.0 – VS Code im Browser → code.eppcom.de (Port 8888, systemd)
+  - `eppcom-token-api` – FastAPI Token-Usage API (Port 3333, systemd)
+  - `Claude Code` v2.1.74 – CLI installiert (Auth via `claude --no-browser`)
+- **Git Repo:** `~/projects/eppcom-ai-automation` (geklont, remote: marcello2304)
 
 ### Server 2 – Hetzner CX33
 - **IP:** 46.224.54.65
@@ -81,6 +85,8 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 |---|---|
 | admin-bot.eppcom.de | Typebot Builder |
 | bot.eppcom.de | Typebot Viewer |
+| code.eppcom.de | code-server (VS Code im Browser) |
+| code.eppcom.de/api/token-usage/dashboard | Token-Usage Dashboard |
 | eppcom.de | Hauptwebsite |
 
 ---
@@ -96,7 +102,16 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ---
 
-## 8. Noch nicht implementiert
+## 8. Abgeschlossene Tasks
+
+- [x] **code-server eingerichtet** – VS Code im Browser via code.eppcom.de (HTTPS, Passwort)
+- [x] **Claude Code auf Server 1** – CLI installiert, Auth via `claude --no-browser`
+- [x] **Token-Sync System** – Cronjob (5 Min), Mac Keychain → Anthropic API → Server Dashboard
+- [x] **Git Repo auf Server 1** – geklont, SSH-Key eingerichtet (marcello2304)
+- [x] **Traefik-Routing** – code-server + Token-API via dynamische Configs
+- [x] **Security** – UFW, .gitignore, chmod 600, sensible Daten geschützt
+
+## 9. Noch nicht implementiert (Backlog)
 
 - n8n Workflows (Ingestion & Retrieval)
 - Backup-Cronjobs
@@ -105,7 +120,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ---
 
-## 9. Skalierungsziel
+## 10. Skalierungsziel
 
 ```
 Start:    10 Kunden
@@ -120,7 +135,7 @@ Stufe 4:  200+ Kunden
 
 ---
 
-## 10. DSGVO & Compliance
+## 11. DSGVO & Compliance
 
 - Alle Server in der **EU (Hetzner Deutschland)**
 - Keine Daten verlassen die EU
@@ -129,7 +144,7 @@ Stufe 4:  200+ Kunden
 
 ---
 
-## 11. SEO / Website (eppcom.de)
+## 12. SEO / Website (eppcom.de)
 
 Durchgeführtes Audit mit folgenden offenen Maßnahmen:
 - Performance-Optimierungen
@@ -140,17 +155,25 @@ Durchgeführtes Audit mit folgenden offenen Maßnahmen:
 
 ---
 
-## 12. Lokale Entwicklungsumgebung
+## 13. Entwicklungsumgebung
 
+### Lokal (Mac)
 - **Mac:** Marcel's MacBook Air
 - **IDE:** Visual Studio Code
 - **Projektpfad:** `~/projects/eppcom-ai-automation/`
 - **Claude Code starten:** `cd ~/projects/eppcom-ai-automation && claude`
 - **Settings:** `.claude/settings.local.json`
 
+### Remote (code-server)
+- **URL:** https://code.eppcom.de (Passwort-geschützt)
+- **Zugang:** Mac, iPad, iPhone – jeder Browser
+- **Claude Code:** `claude --no-browser` im Terminal
+- **Git-Sync:** Änderungen per `git commit + push/pull` synchronisieren
+- **Projektpfad Server:** `~/projects/eppcom-ai-automation/`
+
 ---
 
-## 13. Wichtige Befehle
+## 14. Wichtige Befehle
 
 ```bash
 # SSH Server 1
@@ -174,7 +197,7 @@ cd ~/projects/eppcom-ai-automation && claude
 
 ---
 
-## 14. Session-Start Checkliste
+## 15. Session-Start Checkliste
 
 Zu Beginn jeder Claude Code Session:
 1. CLAUDE.md lesen (diese Datei)
@@ -183,5 +206,5 @@ Zu Beginn jeder Claude Code Session:
 
 ---
 
-*Zuletzt aktualisiert: März 2026*
+*Zuletzt aktualisiert: 13. März 2026*
 *Bei Fortschritt: CLAUDE.md aktualisieren und committen*
