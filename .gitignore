@@ -38,3 +38,16 @@ node_modules/
 
 # Logs
 *.log
+# Credentials & Secrets
+.env
+.env.*.local
+.env.local
+.env.*.example.local
+*.env.bak
+secrets/
+credentials/
+
+# Spezifische Secrets
+**/SMTP_PASSWORD
+**/POSTGRES_PASSWORD
+**/API_KEY
