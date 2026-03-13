@@ -1,0 +1,1 @@
+mnnkdir -p ~/.config/code-server cat > ~/.config/code-server/config.yaml << 'EOF' bind-addr: 127.0.0.1:8888 auth: password password: REDACTED cert: false EOF # Dienst neu starten systemctl restart code-server@root systemctl status code-server@root
