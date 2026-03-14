@@ -5,18 +5,26 @@
 
 set -euo pipefail
 
+# --- .env laden ---
+ENV_FILE="/root/projects/eppcom-ai-automation/.env"
+if [ -f "$ENV_FILE" ]; then
+    set -a
+    source "$ENV_FILE"
+    set +a
+fi
+
 # --- Konfiguration ---
 BACKUP_DIR="/root/backups"
 DATE=$(date +%Y%m%d_%H%M%S)
 BACKUP_SUBDIR="${BACKUP_DIR}/${DATE}"
 LOCAL_RETENTION_DAYS=7
 
-# S3 (Hetzner Object Storage)
-S3_BUCKET="eppcom-backups"
-S3_ENDPOINT="https://nbg1.your-objectstorage.com"
-S3_ACCESS_KEY="REDACTED"
-S3_SECRET_KEY="REDACTED"
-S3_REGION="nbg1"
+# S3 (Hetzner Object Storage) – aus .env oder Umgebung
+S3_BUCKET="${S3_BUCKET:-eppcom-backups}"
+S3_ENDPOINT="${S3_ENDPOINT:-https://nbg1.your-objectstorage.com}"
+S3_ACCESS_KEY="${S3_ACCESS_KEY:-}"
+S3_SECRET_KEY="${S3_SECRET_KEY:-}"
+S3_REGION="${S3_REGION:-nbg1}"
 S3_RETENTION_DAYS=30
 
 # PostgreSQL Container
