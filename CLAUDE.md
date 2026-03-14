@@ -93,8 +93,6 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **n8n Ingestion Workflow** – Dokumente in pgvector einlesen
-- [ ] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort über n8n
 - [ ] **Typebot Template importieren** – `Work/VoiceflowChatbot/voiceflow-chatbot-template.json` in admin-bot.eppcom.de importieren & testen
 - [ ] **Backup-Cronjob einrichten** – PostgreSQL + Dateien automatisch sichern
 - [ ] **Ersten Kunden-Tenant onboarden** – Erster produktiver Mandant
@@ -115,6 +113,8 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **leads Tabelle** – in app_db angelegt (email unique, status, notizen)
 - [x] **Claude Code Auto-Permissions** – alle Tools auto-approved, Modell Opus 4.6 gesetzt
 - [x] **n8n Contact-Lead Workflow** – importiert & aktiviert, Webhook: `https://workflows.eppcom.de/webhook/ingest`, Credentials: postgres-rag (app_db) + EPPCOM SMTP (IONOS)
+- [x] **n8n Ingestion Workflow** – RAG-Pipeline aktiv, Webhook: `https://workflows.eppcom.de/webhook/rag-ingest`, Text→Chunks→Ollama Embeddings→pgvector
+- [x] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort, Webhook: `https://workflows.eppcom.de/webhook/rag-query`, Query→Embedding→pgvector→qwen3:1.7b
 
 ## 9. Noch nicht implementiert (Backlog)
 
