@@ -1,0 +1,131 @@
+{
+  "name": "Contact Lead Ingest",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "ingest",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [240, 300],
+      "webhookId": "contact-lead-ingest"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst name     = (body.name     || '').trim();\nconst email    = (body.email    || '').trim();\nconst telefon  = (body.telefon  || '').trim();\nconst nachricht= (body.nachricht|| '').trim();\nconst quelle   = (body.quelle   || 'Unbekannt').trim();\nconst datum    = body.datum || new Date().toISOString();\n\nif (!email) throw new Error('E-Mail fehlt');\n\nreturn [{ json: { name, email, telefon, nachricht, quelle, datum } }];"
+      },
+      "id": "n-validate",
+      "name": "Validieren & Normalisieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [460, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "INSERT INTO leads (name, email, telefon, nachricht, quelle, erstellt_am)\nVALUES (\n  '{{ $json.name }}',\n  '{{ $json.email }}',\n  '{{ $json.telefon }}',\n  '{{ $json.nachricht }}',\n  '{{ $json.quelle }}',\n  '{{ $json.datum }}'\n)\nON CONFLICT (email) DO UPDATE SET\n  name       = EXCLUDED.name,\n  telefon    = EXCLUDED.telefon,\n  nachricht  = EXCLUDED.nachricht,\n  quelle     = EXCLUDED.quelle,\n  erstellt_am= EXCLUDED.erstellt_am\nRETURNING id;",
+        "options": {}
+      },
+      "id": "n-postgres",
+      "name": "In PostgreSQL speichern",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [680, 200],
+      "credentials": {
+        "postgres": {
+          "name": "postgres-rag"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "fromEmail": "kontakt@eppcom.de",
+        "toEmail": "kontakt@eppcom.de",
+        "subject": "=Neue Anfrage von {{ $('Validieren & Normalisieren').item.json.name }} via {{ $('Validieren & Normalisieren').item.json.quelle }}",
+        "emailType": "html",
+        "message": "=<h2>Neue Kontaktanfrage</h2>\n<table style=\"border-collapse:collapse;width:100%;font-family:Arial,sans-serif\">\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold;width:140px\">Name</td><td style=\"padding:8px;border-bottom:1px solid #eee\">{{ $('Validieren & Normalisieren').item.json.name }}</td></tr>\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold\">E-Mail</td><td style=\"padding:8px;border-bottom:1px solid #eee\"><a href=\"mailto:{{ $('Validieren & Normalisieren').item.json.email }}\">{{ $('Validieren & Normalisieren').item.json.email }}</a></td></tr>\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold\">Telefon</td><td style=\"padding:8px;border-bottom:1px solid #eee\">{{ $('Validieren & Normalisieren').item.json.telefon || '–' }}</td></tr>\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold\">Nachricht</td><td style=\"padding:8px;border-bottom:1px solid #eee\">{{ $('Validieren & Normalisieren').item.json.nachricht }}</td></tr>\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold\">Quelle</td><td style=\"padding:8px;border-bottom:1px solid #eee\">{{ $('Validieren & Normalisieren').item.json.quelle }}</td></tr>\n  <tr><td style=\"padding:8px;background:#f0f4ff;font-weight:bold\">Datum</td><td style=\"padding:8px\">{{ $('Validieren & Normalisieren').item.json.datum }}</td></tr>\n</table>\n<p style=\"margin-top:20px\"><a href=\"https://workflows.eppcom.de\" style=\"background:#2563EB;color:#fff;padding:10px 20px;text-decoration:none;border-radius:6px\">n8n öffnen</a></p>",
+        "options": {}
+      },
+      "id": "n-email",
+      "name": "E-Mail an Marcel",
+      "type": "n8n-nodes-base.emailSend",
+      "typeVersion": 2.1,
+      "position": [680, 400],
+      "credentials": {
+        "smtp": {
+          "name": "EPPCOM SMTP"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"ok\", \"message\": \"Lead gespeichert\" }",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "n-response",
+      "name": "Response OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={ \"status\": \"error\", \"message\": $json.message }",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "n-error-response",
+      "name": "Response Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [900, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "Validieren & Normalisieren", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validieren & Normalisieren": {
+      "main": [
+        [
+          { "node": "In PostgreSQL speichern", "type": "main", "index": 0 },
+          { "node": "E-Mail an Marcel", "type": "main", "index": 0 }
+        ]
+      ]
+    },
+    "In PostgreSQL speichern": {
+      "main": [
+        [{ "node": "Response OK", "type": "main", "index": 0 }]
+      ]
+    },
+    "E-Mail an Marcel": {
+      "main": [
+        [{ "node": "Response OK", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "pinData": {},
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null,
+  "tags": ["chatbot", "leads", "ingest"],
+  "triggerCount": 1,
+  "updatedAt": "2026-03-13T00:00:00.000Z",
+  "versionId": "1"
+}

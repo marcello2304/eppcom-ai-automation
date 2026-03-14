@@ -10,7 +10,10 @@
       "WebFetch(*)",
       "WebSearch(*)",
       "Agent(*)",
-      "Task(*)"
+      "Task(*)",
+      "NotebookEdit(*)",
+      "TodoWrite(*)",
+      "TodoRead(*)"
     ],
     "deny": []
   }
