@@ -93,7 +93,6 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **Typebot Template importieren** – `Work/VoiceflowChatbot/voiceflow-chatbot-template.json` in admin-bot.eppcom.de importieren & testen
 - [ ] **Backup-Cronjob einrichten** – PostgreSQL + Dateien automatisch sichern
 - [ ] **Ersten Kunden-Tenant onboarden** – Erster produktiver Mandant
 
@@ -115,6 +114,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **n8n Contact-Lead Workflow** – importiert & aktiviert, Webhook: `https://workflows.eppcom.de/webhook/ingest`, Credentials: postgres-rag (app_db) + EPPCOM SMTP (IONOS)
 - [x] **n8n Ingestion Workflow** – RAG-Pipeline aktiv, Webhook: `https://workflows.eppcom.de/webhook/rag-ingest`, Text→Chunks→Ollama Embeddings→pgvector
 - [x] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort, Webhook: `https://workflows.eppcom.de/webhook/rag-query`, Query→Embedding→pgvector→qwen3:1.7b
+- [x] **Typebot Template importiert** – "EPPCOM Chatbot v2 (RAG)" veröffentlicht unter `https://bot.eppcom.de/eppcom-chatbot-v2`, Ollama-Chat + Lead-Webhook integriert
 
 ## 9. Noch nicht implementiert (Backlog)
 
