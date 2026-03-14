@@ -93,7 +93,6 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **n8n Contact-Lead Workflow importieren & aktivieren** – JSON liegt in `Work/n8n-workflows/contact-lead-ingest.json`, Credentials (postgres-rag + EPPCOM SMTP) konfigurieren, Workflow aktivieren. Marcel gibt Claude API-Key für n8n → dann automatisch.
 - [ ] **n8n Ingestion Workflow** – Dokumente in pgvector einlesen
 - [ ] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort über n8n
 - [ ] **Typebot Template importieren** – `Work/VoiceflowChatbot/voiceflow-chatbot-template.json` in admin-bot.eppcom.de importieren & testen
@@ -115,6 +114,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **Typebot Chatbot Template** – Ollama-Webhook, Telefonnummer-Feld, n8n-Lead-Webhook integriert
 - [x] **leads Tabelle** – in app_db angelegt (email unique, status, notizen)
 - [x] **Claude Code Auto-Permissions** – alle Tools auto-approved, Modell Opus 4.6 gesetzt
+- [x] **n8n Contact-Lead Workflow** – importiert & aktiviert, Webhook: `https://workflows.eppcom.de/webhook/ingest`, Credentials: postgres-rag (app_db) + EPPCOM SMTP (IONOS)
 
 ## 9. Noch nicht implementiert (Backlog)
 
