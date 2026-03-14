@@ -27,49 +27,13 @@
     },
     {
       "parameters": {
-        "operation": "executeQuery",
-        "query": "WITH new_source AS (\n  INSERT INTO sources (tenant_id, name, source_type, status)\n  VALUES ('{{ $json.tenant_id }}', '{{ $json.source_name }}', '{{ $json.source_type }}', 'processing')\n  RETURNING id\n),\nnew_doc AS (\n  INSERT INTO documents (source_id, tenant_id, content)\n  SELECT id, '{{ $json.tenant_id }}', '{{ $json.text }}' FROM new_source\n  RETURNING id, source_id\n)\nSELECT new_doc.id AS document_id, new_doc.source_id FROM new_doc;",
-        "options": {}
-      },
-      "id": "n-create-source-doc",
-      "name": "Source + Document anlegen",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.5,
-      "position": [640, 300],
-      "credentials": {
-        "postgres": {
-          "id": "TsyP1alpbpG1mxvi",
-          "name": "postgres-rag (app_db)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "jsCode": "const input = $('Validieren').first().json;\nconst dbResult = $input.first().json;\nconst text = input.text;\nconst tenant_id = input.tenant_id;\nconst document_id = dbResult.document_id;\nconst source_id = dbResult.source_id;\n\n// Chunking: ~500 Zeichen pro Chunk mit Satz-Grenzen\nconst MAX_CHUNK_SIZE = 500;\nconst chunks = [];\nlet remaining = text;\nlet index = 0;\n\nwhile (remaining.length > 0) {\n  let end = Math.min(remaining.length, MAX_CHUNK_SIZE);\n  \n  if (end < remaining.length) {\n    const lastPeriod = remaining.lastIndexOf('.', end);\n    const lastNewline = remaining.lastIndexOf('\\n', end);\n    const splitAt = Math.max(lastPeriod, lastNewline);\n    if (splitAt > MAX_CHUNK_SIZE * 0.3) {\n      end = splitAt + 1;\n    }\n  }\n  \n  const chunk = remaining.substring(0, end).trim();\n  if (chunk.length > 0) {\n    chunks.push({\n      json: {\n        tenant_id,\n        source_id,\n        document_id,\n        content: chunk,\n        chunk_index: index,\n        token_count: Math.ceil(chunk.length / 4)\n      }\n    });\n    index++;\n  }\n  remaining = remaining.substring(end).trim();\n}\n\nreturn chunks;"
+        "jsCode": "const input = $input.first().json;\nconst text = input.text;\n\nconst MAX_CHUNK_SIZE = 500;\nconst chunks = [];\nlet remaining = text;\n\nwhile (remaining.length > 0) {\n  let end = Math.min(remaining.length, MAX_CHUNK_SIZE);\n  if (end < remaining.length) {\n    const lastPeriod = remaining.lastIndexOf('.', end);\n    const lastNewline = remaining.lastIndexOf('\\n', end);\n    const splitAt = Math.max(lastPeriod, lastNewline);\n    if (splitAt > MAX_CHUNK_SIZE * 0.3) {\n      end = splitAt + 1;\n    }\n  }\n  const chunk = remaining.substring(0, end).trim();\n  if (chunk.length > 0) chunks.push(chunk);\n  remaining = remaining.substring(end).trim();\n}\n\nreturn [{ json: { ...input, chunks } }];"
       },
       "id": "n-chunk",
       "name": "Text Chunking",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [860, 300]
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "INSERT INTO chunks (document_id, tenant_id, content, chunk_index, token_count)\nVALUES (\n  '{{ $json.document_id }}',\n  '{{ $json.tenant_id }}',\n  {{ $json.content.includes(\"'\") ? \"$$\" + $json.content + \"$$\" : \"'\" + $json.content + \"'\" }},\n  {{ $json.chunk_index }},\n  {{ $json.token_count }}\n)\nRETURNING id;",
-        "options": {}
-      },
-      "id": "n-save-chunk",
-      "name": "Chunk speichern",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.5,
-      "position": [1080, 300],
-      "credentials": {
-        "postgres": {
-          "id": "TsyP1alpbpG1mxvi",
-          "name": "postgres-rag (app_db)"
-        }
-      }
+      "position": [640, 300]
     },
     {
       "parameters": {
@@ -77,56 +41,38 @@
         "url": "http://46.224.54.65:11434/api/embed",
         "sendBody": true,
         "specifyBody": "json",
-        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: $('Text Chunking').item.json.content }) }}",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: $json.chunks }) }}",
         "options": {
-          "timeout": 30000
+          "timeout": 60000
         }
       },
-      "id": "n-embedding",
-      "name": "Ollama Embedding",
+      "id": "n-batch-embed",
+      "name": "Batch Embedding",
       "type": "n8n-nodes-base.httpRequest",
       "typeVersion": 4.2,
-      "position": [1300, 300]
+      "position": [860, 300]
     },
     {
       "parameters": {
-        "jsCode": "const chunkResult = $('Chunk speichern').item.json;\nconst embeddingResponse = $input.first().json;\nconst chunk = $('Text Chunking').item.json;\n\nconst embedding = embeddingResponse.embeddings[0];\nconst embeddingStr = '[' + embedding.join(',') + ']';\n\nreturn [{ json: {\n  chunk_id: chunkResult.id,\n  tenant_id: chunk.tenant_id,\n  embedding: embeddingStr\n}}];"
+        "jsCode": "const validated = $('Text Chunking').first().json;\nconst embedResponse = $input.first().json;\nconst chunks = validated.chunks;\nconst embeddings = embedResponse.embeddings;\nconst tenant_id = validated.tenant_id;\nconst text = validated.text;\nconst source_name = validated.source_name;\nconst source_type = validated.source_type;\n\nconst esc = (s) => s.replace(/'/g, \"''\");\n\nconst chunkVals = chunks.map((c, i) =>\n  `((SELECT id FROM new_doc), '${tenant_id}', '${esc(c)}', ${i}, ${Math.ceil(c.length / 4)})`\n).join(',\\n  ');\n\nconst embVals = embeddings.map((emb, i) => {\n  const embStr = '[' + emb.join(',') + ']';\n  return `((SELECT id FROM new_chunks WHERE chunk_index = ${i}), '${tenant_id}', '${embStr}')`;\n}).join(',\\n  ');\n\nconst sql = `WITH new_source AS (\n  INSERT INTO sources (tenant_id, name, source_type, status)\n  VALUES ('${tenant_id}', '${esc(source_name)}', '${source_type}', 'completed')\n  RETURNING id\n),\nnew_doc AS (\n  INSERT INTO documents (source_id, tenant_id, content)\n  SELECT id, '${tenant_id}', '${esc(text)}' FROM new_source\n  RETURNING id, source_id\n),\nnew_chunks AS (\n  INSERT INTO chunks (document_id, tenant_id, content, chunk_index, token_count)\n  VALUES ${chunkVals}\n  RETURNING id, chunk_index\n),\nnew_embeddings AS (\n  INSERT INTO embeddings (chunk_id, tenant_id, embedding)\n  VALUES ${embVals}\n)\nSELECT source_id, id AS document_id FROM new_doc`;\n\nreturn [{ json: { sql, chunk_count: chunks.length } }];"
       },
-      "id": "n-prepare-embedding",
-      "name": "Embedding vorbereiten",
+      "id": "n-build-sql",
+      "name": "SQL bauen",
       "type": "n8n-nodes-base.code",
       "typeVersion": 2,
-      "position": [1520, 300]
+      "position": [1080, 300]
     },
     {
       "parameters": {
         "operation": "executeQuery",
-        "query": "INSERT INTO embeddings (chunk_id, tenant_id, embedding)\nVALUES (\n  '{{ $json.chunk_id }}',\n  '{{ $json.tenant_id }}',\n  '{{ $json.embedding }}'\n);",
+        "query": "{{ $json.sql }}",
         "options": {}
       },
-      "id": "n-save-embedding",
-      "name": "Embedding speichern",
+      "id": "n-execute-sql",
+      "name": "Alles speichern",
       "type": "n8n-nodes-base.postgres",
       "typeVersion": 2.5,
-      "position": [1740, 300],
-      "credentials": {
-        "postgres": {
-          "id": "TsyP1alpbpG1mxvi",
-          "name": "postgres-rag (app_db)"
-        }
-      }
-    },
-    {
-      "parameters": {
-        "operation": "executeQuery",
-        "query": "UPDATE sources SET status = 'completed', updated_at = NOW()\nWHERE id = '{{ $('Text Chunking').first().json.source_id }}';",
-        "options": {}
-      },
-      "id": "n-update-source",
-      "name": "Source → completed",
-      "type": "n8n-nodes-base.postgres",
-      "typeVersion": 2.5,
-      "position": [1960, 300],
+      "position": [1300, 300],
       "credentials": {
         "postgres": {
           "id": "TsyP1alpbpG1mxvi",
@@ -137,7 +83,7 @@
     {
       "parameters": {
         "respondWith": "json",
-        "responseBody": "={{ JSON.stringify({ status: 'ok', message: 'Dokument verarbeitet', source_id: $('Text Chunking').first().json.source_id, document_id: $('Text Chunking').first().json.document_id }) }}",
+        "responseBody": "={{ JSON.stringify({ status: 'ok', message: 'Dokument verarbeitet', source_id: $json.source_id, document_id: $json.document_id, chunks_created: $('SQL bauen').first().json.chunk_count }) }}",
         "options": {
           "responseCode": 200
         }
@@ -146,7 +92,7 @@
       "name": "Response OK",
       "type": "n8n-nodes-base.respondToWebhook",
       "typeVersion": 1.1,
-      "position": [2180, 300]
+      "position": [1520, 300]
     },
     {
       "parameters": {
@@ -171,40 +117,25 @@
     },
     "Validieren": {
       "main": [
-        [{ "node": "Source + Document anlegen", "type": "main", "index": 0 }]
-      ]
-    },
-    "Source + Document anlegen": {
-      "main": [
         [{ "node": "Text Chunking", "type": "main", "index": 0 }]
       ]
     },
     "Text Chunking": {
       "main": [
-        [{ "node": "Chunk speichern", "type": "main", "index": 0 }]
+        [{ "node": "Batch Embedding", "type": "main", "index": 0 }]
       ]
     },
-    "Chunk speichern": {
+    "Batch Embedding": {
       "main": [
-        [{ "node": "Ollama Embedding", "type": "main", "index": 0 }]
+        [{ "node": "SQL bauen", "type": "main", "index": 0 }]
       ]
     },
-    "Ollama Embedding": {
+    "SQL bauen": {
       "main": [
-        [{ "node": "Embedding vorbereiten", "type": "main", "index": 0 }]
+        [{ "node": "Alles speichern", "type": "main", "index": 0 }]
       ]
     },
-    "Embedding vorbereiten": {
-      "main": [
-        [{ "node": "Embedding speichern", "type": "main", "index": 0 }]
-      ]
-    },
-    "Embedding speichern": {
-      "main": [
-        [{ "node": "Source → completed", "type": "main", "index": 0 }]
-      ]
-    },
-    "Source → completed": {
+    "Alles speichern": {
       "main": [
         [{ "node": "Response OK", "type": "main", "index": 0 }]
       ]

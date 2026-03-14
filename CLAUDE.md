@@ -93,7 +93,6 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **Ersten Kunden-Tenant onboarden** – Erster produktiver Mandant
 
 ---
 
@@ -115,6 +114,8 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort, Webhook: `https://workflows.eppcom.de/webhook/rag-query`, Query→Embedding→pgvector→qwen3:1.7b
 - [x] **Typebot Template importiert** – "EPPCOM Chatbot v2 (RAG)" veröffentlicht unter `https://bot.eppcom.de/eppcom-chatbot-v2`, Ollama-Chat + Lead-Webhook integriert
 - [x] **Backup-Cronjob** – täglich 3:00 Uhr, app_db + typebot_db + n8n + configs, 7 Tage lokal, S3-Upload vorbereitet
+- [x] **Erster Tenant (EPPCOM) onboarded** – 3 Dokumente (Profil, Services, Technik), 7 Chunks, 7 Embeddings, RAG-Query getestet
+- [x] **Ingestion Workflow v5** – Batch-Embedding + Single-CTE-SQL, alle Chunks+Embeddings atomar in einer Transaktion
 
 ## 9. Noch nicht implementiert (Backlog)
 
