@@ -93,10 +93,10 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **Fix `/no_think` Modelfile** – qwen3:1.7b Modelfile-Issue in Ollama
-- [ ] **Server 1 → Server 2 Connectivity-Test** – Verbindung zwischen beiden Servern verifizieren
+- [ ] **n8n Contact-Lead Workflow importieren & aktivieren** – JSON liegt in `Work/n8n-workflows/contact-lead-ingest.json`, Credentials (postgres-rag + EPPCOM SMTP) konfigurieren, Workflow aktivieren. Marcel gibt Claude API-Key für n8n → dann automatisch.
 - [ ] **n8n Ingestion Workflow** – Dokumente in pgvector einlesen
 - [ ] **n8n RAG Retrieval Workflow** – Vektorsuche + LLM-Antwort über n8n
+- [ ] **Typebot Template importieren** – `Work/VoiceflowChatbot/voiceflow-chatbot-template.json` in admin-bot.eppcom.de importieren & testen
 - [ ] **Backup-Cronjob einrichten** – PostgreSQL + Dateien automatisch sichern
 - [ ] **Ersten Kunden-Tenant onboarden** – Erster produktiver Mandant
 
@@ -110,6 +110,11 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **Git Repo auf Server 1** – geklont, SSH-Key eingerichtet (marcello2304)
 - [x] **Traefik-Routing** – code-server + Token-API via dynamische Configs
 - [x] **Security** – UFW, .gitignore, chmod 600, sensible Daten geschützt
+- [x] **Server 1 → Server 2 Connectivity** – SSH-Key + UFW Port 11434 + Ollama auf 0.0.0.0 konfiguriert
+- [x] **Fix `/no_think` Modelfile** – `qwen3-nothink:latest` bereits vorhanden auf Server 2
+- [x] **Typebot Chatbot Template** – Ollama-Webhook, Telefonnummer-Feld, n8n-Lead-Webhook integriert
+- [x] **leads Tabelle** – in app_db angelegt (email unique, status, notizen)
+- [x] **Claude Code Auto-Permissions** – alle Tools auto-approved, Modell Opus 4.6 gesetzt
 
 ## 9. Noch nicht implementiert (Backlog)
 
