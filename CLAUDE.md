@@ -43,10 +43,11 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ### Server 2 – Hetzner CX33
 - **IP:** 46.224.54.65
-- **Rolle:** LLM-Inferenz
+- **Rolle:** LLM-Inferenz & Voice-Stack
 - **Laufende Dienste:**
   - `ollama` – Lokale LLM-Inferenz (Port 11434)
-- **Geplant:** LiveKit Voicebot-Stack
+  - `livekit-db` – PostgreSQL für LiveKit (Port 5433)
+  - `livekit-server` – Voice-Signaling Server (Port 7880, 3478)
 
 ### Geplante Hardware (zurückgestellt bis Produktion)
 - Hetzner AX42 oder GEX44 (Dedicated)
@@ -118,15 +119,17 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **Ingestion Workflow v5** – Batch-Embedding + Single-CTE-SQL, alle Chunks+Embeddings atomar in einer Transaktion
 
 ## 9. Noch nicht implementiert (Backlog)
+- n8n Voice Workflows (erweiterte Konfiguration)
+- LiveKit WebRTC Optimierung für Edge-Cases
 
-- n8n Workflows (Ingestion & Retrieval)
-- Backup-Cronjobs
-- Voicebot-Stack auf Server 2 (nur Dokumentation vorhanden)
-- LiveKit-Integration
+## 10. Kürzlich implementiert
+- [x] **LiveKit Voice-Stack** – Server 2 PostgreSQL + LiveKit Server, livekit.eppcom.de
+- [x] **voice-agent Integration** – LIVEKIT_API_KEY konfiguriert, Typebot Widget Voice-ready
+- [x] **Traefik Routing** – livekit.eppcom.de via Traefik + Let's Encrypt
 
 ---
 
-## 10. Skalierungsziel
+## 11. Skalierungsziel
 
 ```
 Start:    10 Kunden
@@ -141,7 +144,7 @@ Stufe 4:  200+ Kunden
 
 ---
 
-## 11. DSGVO & Compliance
+## 12. DSGVO & Compliance
 
 - Alle Server in der **EU (Hetzner Deutschland)**
 - Keine Daten verlassen die EU
@@ -150,7 +153,7 @@ Stufe 4:  200+ Kunden
 
 ---
 
-## 12. SEO / Website (eppcom.de)
+## 13. SEO / Website (eppcom.de)
 
 Durchgeführtes Audit mit folgenden offenen Maßnahmen:
 - Performance-Optimierungen
@@ -161,7 +164,7 @@ Durchgeführtes Audit mit folgenden offenen Maßnahmen:
 
 ---
 
-## 13. Entwicklungsumgebung
+## 14. Entwicklungsumgebung
 
 ### Lokal (Mac)
 - **Mac:** Marcel's MacBook Air
@@ -179,7 +182,7 @@ Durchgeführtes Audit mit folgenden offenen Maßnahmen:
 
 ---
 
-## 14. Wichtige Befehle
+## 15. Wichtige Befehle
 
 ```bash
 # SSH Server 1
@@ -203,7 +206,7 @@ cd ~/projects/eppcom-ai-automation && claude
 
 ---
 
-## 15. Session-Start Checkliste
+## 16. Session-Start Checkliste
 
 Zu Beginn jeder Claude Code Session:
 1. CLAUDE.md lesen (diese Datei)
@@ -212,5 +215,5 @@ Zu Beginn jeder Claude Code Session:
 
 ---
 
-*Zuletzt aktualisiert: 13. März 2026*
+*Zuletzt aktualisiert: 20. März 2026*
 *Bei Fortschritt: CLAUDE.md aktualisieren und committen*
