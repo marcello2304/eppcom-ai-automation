@@ -88,77 +88,84 @@ git commit -m "feat: Add imports and streaming constants for Option B
 **Files:**
 - Modify: `/root/marcello2304/voice-agent/agent.py:193-250` (after NexoAgent class definition)
 
-- [ ] **Step 1: Create unit test for NexoStreamingAgent.llm_node()**
+- [ ] **Step 1: Write failing unit test for sentence buffering logic**
 
 Create `/root/marcello2304/voice-agent/test_streaming.py`:
 
 ```python
-import asyncio
 import re
-from unittest.mock import AsyncMock, MagicMock
 import pytest
 
-# Mock ChatChunk (simplified)
-class MockChatChunk:
-    def __init__(self, text=""):
-        self.text = text
-        self.tool_calls = None
-        self.usage = None
+# Test the CORE buffering logic (no mocks needed, just pure functions)
 
-@pytest.mark.asyncio
-async def test_sentence_buffering():
-    """Test that tokens are buffered until sentence boundary."""
-    # Simulate streaming chunks: "Dr. ", "Mueller ", "arbeitet. ", "Das ist ", "super."
-    chunks = [
-        MockChatChunk(text="Dr. "),
-        MockChatChunk(text="Mueller "),
-        MockChatChunk(text="arbeitet. "),
-        MockChatChunk(text="Das ist "),
-        MockChatChunk(text="super."),
-    ]
+SENTENCE_PATTERN = r'(?<=[.!?])\s+(?=[A-Z])'
+MAX_SENTENCE_LENGTH = 250
 
-    # Expected output: 2 complete sentences
-    expected = ["Dr. Mueller arbeitet.", "Das ist super."]
+def buffer_tokens_until_sentence(text_stream):
+    """Pure function: buffer tokens until sentence boundary.
 
-    # Mock the llm.chat() context manager
-    async def mock_stream():
-        for chunk in chunks:
-            yield chunk
+    Args:
+        text_stream: List of text chunks (simulating ChatChunk.text)
 
-    # We'll test the buffering logic directly
+    Returns:
+        List of complete sentences
+    """
     buffer = ""
     results = []
-    SENTENCE_PATTERN = r'(?<=[.!?])\s+(?=[A-Z])'
 
-    async for chunk in mock_stream():
-        if chunk.text:
-            buffer += chunk.text
+    for text_chunk in text_stream:
+        buffer += text_chunk
 
-            while re.search(SENTENCE_PATTERN, buffer):
-                sentences = re.split(SENTENCE_PATTERN, buffer, maxsplit=1)
-                sentence = sentences[0].strip()
-                buffer = sentences[1] if len(sentences) > 1 else ""
+        while re.search(SENTENCE_PATTERN, buffer):
+            sentences = re.split(SENTENCE_PATTERN, buffer, maxsplit=1)
+            sentence = sentences[0].strip()
+            buffer = sentences[1] if len(sentences) > 1 else ""
 
-                if sentence:
-                    results.append(sentence)
+            # Handle oversized sentences
+            if len(sentence) > MAX_SENTENCE_LENGTH:
+                sentence = sentence[:MAX_SENTENCE_LENGTH-3] + "..."
 
+            if sentence:
+                results.append(sentence)
+
+    # Yield remaining text
     if buffer.strip():
-        results.append(buffer.strip())
+        final_text = buffer.strip()
+        if len(final_text) > MAX_SENTENCE_LENGTH:
+            final_text = final_text[:MAX_SENTENCE_LENGTH-3] + "..."
+        results.append(final_text)
 
-    assert results == expected, f"Expected {expected}, got {results}"
+    return results
 
-@pytest.mark.asyncio
-async def test_oversized_sentence():
+
+def test_sentence_buffering():
+    """Test that tokens buffer correctly until sentence boundary."""
+    text_chunks = ["Dr. ", "Mueller ", "arbeitet. ", "Das ist ", "super."]
+    result = buffer_tokens_until_sentence(text_chunks)
+
+    expected = ["Dr. Mueller arbeitet.", "Das ist super."]
+    assert result == expected, f"Expected {expected}, got {result}"
+
+
+def test_oversized_sentence_truncation():
     """Test that oversized sentences are truncated."""
-    MAX_SENTENCE_LENGTH = 250
-    long_text = "A" * 300 + "."
+    long_sentence = "A" * 300 + ". "
+    text_chunks = [long_sentence, "Next sentence."]
+    result = buffer_tokens_until_sentence(text_chunks)
 
-    # Should be truncated to MAX_SENTENCE_LENGTH-3 + "..."
-    expected_length = MAX_SENTENCE_LENGTH
-    if len(long_text) > MAX_SENTENCE_LENGTH:
-        truncated = long_text[:MAX_SENTENCE_LENGTH-3] + "..."
-        assert len(truncated) <= MAX_SENTENCE_LENGTH
-        assert truncated.endswith("...")
+    # First chunk should be truncated to MAX_SENTENCE_LENGTH
+    assert len(result[0]) <= MAX_SENTENCE_LENGTH
+    assert result[0].endswith("...")
+
+
+def test_german_abbreviations():
+    """Test German abbreviations don't break sentence detection."""
+    text_chunks = ["Fräu Dr. ", "Mueller ", "arbeitet. ", "Das ist ", "wichtig."]
+    result = buffer_tokens_until_sentence(text_chunks)
+
+    # Should detect 2 sentences (not split on "Dr.")
+    assert len(result) == 2
+    assert "Dr. Mueller arbeitet." in result[0]
 ```
 
 - [ ] **Step 2: Run test to verify it fails**
@@ -168,7 +175,7 @@ cd /root/marcello2304/voice-agent && \
 python3 -m pytest test_streaming.py::test_sentence_buffering -v
 ```
 
-Expected: FAIL (test file exists but NexoStreamingAgent doesn't exist yet)
+Expected: PASS (pure function test works, ready to integrate into NexoStreamingAgent)
 
 - [ ] **Step 3: Implement NexoStreamingAgent class**
 
@@ -188,7 +195,7 @@ class NexoStreamingAgent(Agent):
         chat_ctx,
         tools=None,
         **kwargs
-    ) -> AsyncGenerator:
+    ) -> AsyncGenerator[agents.ChatChunk, None]:
         """
         Override LLM node to enable sentence-buffering streaming.
 
@@ -506,20 +513,42 @@ ssh root@46.224.54.65 "echo 'VOICEBOT_STREAMING_ENABLED=true' >> /data/voice-age
 
 ```bash
 cd /root/marcello2304/voice-agent && \
-docker build -t voice-agent:option-b .
+docker build -t voice-agent:option-b-local .
 ```
 
 Expected: Build succeeds with no errors
 
-- [ ] **Step 4: Tag and push to Server 2**
+- [ ] **Step 4: Save and transfer image to Server 2**
 
+**Option A (SSH + tar):**
 ```bash
-# Tag image for Server 2
-docker tag voice-agent:option-b voice-agent:option-b-$(date +%Y%m%d)
+# Save image to tar file
+docker save voice-agent:option-b-local | gzip > /tmp/voice-agent-option-b.tar.gz
 
-# Optional: If using a registry, push there
-# docker push your-registry/voice-agent:option-b
+# Transfer to Server 2
+scp /tmp/voice-agent-option-b.tar.gz root@46.224.54.65:/tmp/
+
+# Load on Server 2
+ssh root@46.224.54.65 << 'EOF'
+cd /tmp && \
+gunzip -c voice-agent-option-b.tar.gz | docker load && \
+docker tag voice-agent:option-b-local voice-agent:latest
+EOF
 ```
+
+**Option B (Direct build on Server 2):**
+```bash
+# Copy source to Server 2
+scp -r /root/marcello2304/voice-agent root@46.224.54.65:/tmp/voice-agent-build
+
+# Build on Server 2
+ssh root@46.224.54.65 << 'EOF'
+cd /tmp/voice-agent-build && \
+docker build -t voice-agent:latest .
+EOF
+```
+
+Expected: `docker images | grep voice-agent` shows image ready on Server 2
 
 - [ ] **Step 5: Deploy to Server 2**
 
@@ -527,17 +556,14 @@ docker tag voice-agent:option-b voice-agent:option-b-$(date +%Y%m%d)
 ssh root@46.224.54.65 << 'EOF'
 cd /data/voice-agent && \
 docker-compose down voice-agent 2>/dev/null || true && \
-docker-compose up -d voice-agent
-
-# Wait for startup
-sleep 3
-
-# Check logs
+sleep 2 && \
+docker-compose up -d voice-agent && \
+sleep 3 && \
 docker logs voice-agent --tail 20
 EOF
 ```
 
-Expected: Logs show "✓ Agent started (STREAMING enabled - Option B)"
+Expected: Logs show "✓ Agent started (STREAMING enabled - Option B)" and no errors
 
 - [ ] **Step 6: Test streaming via livekit.eppcom.de**
 
@@ -602,22 +628,33 @@ Live test results:
 **Files:**
 - Modify: `/root/projects/eppcom-ai-automation/CLAUDE.md` (update status)
 
-- [ ] **Step 1: Measure latency improvement**
+- [ ] **Step 1: Measure latency improvement with structured test**
 
-Compare before/after Option A vs Option B:
+**Method:** Time from user speech ends (VAD silence) to first audio output
 
+**Test Procedure:**
+1. Call voice bot via livekit.eppcom.de
+2. Ask simple question: "Hallo, wie heißt du?" (3-5 seconds of speech)
+3. Stop speaking, start stopwatch immediately
+4. Measure time until first audio output begins
+5. Repeat 5 times, calculate average
+
+**Baseline Measurement:**
 ```bash
-# Option A latency: Time from question end to first audio
-# Expected: ~2-3 seconds (full LLM response before TTS)
+# Current state: Option B (streaming enabled)
+# Measure 5 calls and record times
+# Expected: <1 second to first audio (Sentence 1 streaming starts)
 
-# Option B latency: Time from question end to first audio
-# Expected: <1 second (first sentence streams immediately)
-
-echo "Latency Test Results (measure manually with stopwatch during live test):"
-echo "Option A (phi:latest): Expected 2-3 seconds"
-echo "Option B (streaming):  Expected <1 second"
-echo "Improvement: 50-75% latency reduction"
+# For comparison, if needed, measure Option A baseline:
+# echo "VOICEBOT_STREAMING_ENABLED=false" >> .env
+# docker-compose restart voice-agent
+# Measure 5 calls (expected 2-3 seconds to first audio)
 ```
+
+**Success Criteria:**
+- Option B: First audio within <1 second (target: 500-900ms)
+- Option A baseline (if measured): 2-3 seconds (2000-3000ms)
+- Improvement: >50% latency reduction (1s vs 2.5s average)
 
 - [ ] **Step 2: Update CLAUDE.md with completion status**
 
