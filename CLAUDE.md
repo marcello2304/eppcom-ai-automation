@@ -127,7 +127,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 10. Kürzlich implementiert
 - [x] **LiveKit Voice-Stack** – Server 2 PostgreSQL + LiveKit Server, livekit.eppcom.de
-- [x] **voice-agent Integration** – LIVEKIT_API_KEY konfiguriert, Typebot Widget Voice-ready
+- [x] **voice-agent Integration** – Worker registered (AW_2WdSVfZ97bqv), Typebot Widget Voice-ready, phi:latest model
 - [x] **Traefik Routing** – livekit.eppcom.de via Traefik + Let's Encrypt
 
 ---
