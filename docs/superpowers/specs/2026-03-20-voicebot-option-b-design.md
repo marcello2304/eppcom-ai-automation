@@ -112,20 +112,30 @@ livekit-agents v1.4 supports custom `llm_node()` override. This is where we inte
 **New Agent Subclass with Streaming:**
 
 ```python
+import re
+from livekit.agents import Agent, ChatChunk
+
+# Sentence boundary regex (at module level)
+SENTENCE_PATTERN = r'(?<=[.!?])\s+(?=[A-Z])'
+MAX_SENTENCE_LENGTH = 250  # Cartesia TTS limit (~200-300 tokens)
+
 class NexoStreamingAgent(Agent):
     """Voice agent with sentence-level streaming buffering."""
+
+    def __init__(self, instructions: str = ""):
+        """Initialize streaming agent with system instructions."""
+        super().__init__(instructions=instructions)
 
     async def llm_node(self, chat_ctx, tools=None, **kwargs):
         """
         Override LLM node to enable sentence-buffering streaming.
         - Streams LLM response as ChatChunk objects
         - Buffers tokens until sentence boundary
-        - Yields complete sentences to caller
+        - Yields complete sentences (respecting TTS input limits)
         """
         # Use built-in LLM streaming API (livekit-agents v1.4+)
         async with self.llm.chat(chat_ctx=chat_ctx, tools=tools) as stream:
             buffer = ""
-            sentence_pattern = r'(?<=[.!?])\s+(?=[A-Z])'  # Regex for sentence boundaries
 
             async for chunk in stream:
                 # chunk is ChatChunk with .text, .tool_calls, .usage
@@ -133,27 +143,32 @@ class NexoStreamingAgent(Agent):
                     buffer += chunk.text
 
                     # Check if we have complete sentences (. ! ? followed by space + capital)
-                    if re.search(sentence_pattern, buffer):
+                    while re.search(SENTENCE_PATTERN, buffer):
                         # Split on sentence boundary
-                        import re
-                        sentences = re.split(sentence_pattern, buffer)
+                        sentences = re.split(SENTENCE_PATTERN, buffer, maxsplit=1)
+                        sentence = sentences[0].strip()
+                        buffer = sentences[1] if len(sentences) > 1 else ""
 
-                        # Yield complete sentences
-                        for sentence in sentences[:-1]:  # All but last (incomplete)
-                            if sentence.strip():
-                                # Create new ChatChunk for sentence
-                                yield agents.ChatChunk(text=sentence.strip())
+                        # Handle oversized sentences (TTS limit)
+                        if len(sentence) > MAX_SENTENCE_LENGTH:
+                            # Split on word boundaries with ellipsis
+                            sentence = sentence[:MAX_SENTENCE_LENGTH-3] + "..."
 
-                        # Keep incomplete part in buffer
-                        buffer = sentences[-1] if sentences else ""
+                        if sentence:
+                            # Yield complete sentence as ChatChunk
+                            yield ChatChunk(text=sentence)
 
                 else:
                     # Non-text chunks (tool calls, usage) pass through
                     yield chunk
 
-            # Yield remaining text at end
+            # Yield remaining text at end (if not empty)
             if buffer.strip():
-                yield agents.ChatChunk(text=buffer.strip())
+                # Handle oversized final chunk
+                final_text = buffer.strip()
+                if len(final_text) > MAX_SENTENCE_LENGTH:
+                    final_text = final_text[:MAX_SENTENCE_LENGTH-3] + "..."
+                yield ChatChunk(text=final_text)
 ```
 
 **Integration in entrypoint:**
@@ -266,12 +281,36 @@ Stream LLM with enriched system prompt
       ("Hallo. Das ist gut.", ["Hallo.", "Das ist gut."]),
       ("Dr. Mueller arbeitet. Super.", ["Dr. Mueller arbeitet.", "Super."]),
       ("Was ist...? Eigenartig!", ["Was ist...?", "Eigenartig!"]),
+      ("Punkt 1. Punkt 2. Punkt 3.", ["Punkt 1.", "Punkt 2.", "Punkt 3."]),
   ]
   for text, expected in test_cases:
       result = re.split(SENTENCE_PATTERN, text)
       assert result == expected
   ```
-- Verify ChatChunk buffering in `llm_node()` override
+
+- Test ChatChunk buffering with actual ChatChunk objects:
+  ```python
+  # Mock ChatChunk streaming
+  async def mock_stream():
+      chunks = [
+          ChatChunk(text="Dr. "),
+          ChatChunk(text="Mueller "),
+          ChatChunk(text="arbeitet. "),
+          ChatChunk(text="Das ist "),
+          ChatChunk(text="super."),
+      ]
+      for chunk in chunks:
+          yield chunk
+
+  # Run through llm_node logic, expect 2 yielded sentences
+  agent = NexoStreamingAgent(instructions="Test")
+  results = []
+  async for output_chunk in agent.llm_node_logic(mock_stream()):
+      results.append(output_chunk.text)
+
+  assert results == ["Dr. Mueller arbeitet.", "Das ist super."]
+  ```
+
 - Mock AgentSession.start() to test without LiveKit server
 
 **Integration Tests:**
@@ -299,18 +338,32 @@ Stream LLM with enriched system prompt
 - None (changes contained in agent.py)
 
 **Environment Variables:**
-- No new env vars required (uses existing OLLAMA_BASE_URL, CARTESIA_API_KEY, etc.)
+- New: `VOICEBOT_STREAMING_ENABLED` (default: `true`)
+  - Set to `false` to use old non-streaming `NexoAgent` instead of `NexoStreamingAgent`
+  - Example: `docker run -e VOICEBOT_STREAMING_ENABLED=false ...`
 
 **Docker Rebuild:**
 ```bash
 docker build -t voice-agent:option-b .
-docker run -e LIVEKIT_URL=ws://livekit:7880 ... voice-agent:option-b
+docker run \
+  -e LIVEKIT_URL=ws://livekit:7880 \
+  -e VOICEBOT_STREAMING_ENABLED=true \
+  ... \
+  voice-agent:option-b
 ```
 
 **Rollback Plan:**
-- Keep old `get_llm_response()` function as fallback
-- Can disable streaming by setting ENV var or commenting callback override
-- Previous Docker image available on Server 2
+```python
+# In entrypoint():
+if os.getenv("VOICEBOT_STREAMING_ENABLED", "true").lower() == "true":
+    agent_class = NexoStreamingAgent
+else:
+    agent_class = NexoAgent  # Old non-streaming version
+```
+
+- Keep old `NexoAgent` class available
+- Set `VOICEBOT_STREAMING_ENABLED=false` to disable streaming
+- Previous Docker image available on Server 2 for quick rollback
 
 ---
 
