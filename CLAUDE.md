@@ -94,6 +94,8 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
+- [ ] **Voicebot Option B (Token-Streaming)** – Enable streaming for perceived latency improvement (3-4 hours)
+- [ ] **Option C (Cartesia STT/TTS)** – Next week, 8 hours
 
 ---
 
@@ -117,6 +119,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **Backup-Cronjob** – täglich 3:00 Uhr, app_db + typebot_db + n8n + configs, 7 Tage lokal, S3-Upload vorbereitet
 - [x] **Erster Tenant (EPPCOM) onboarded** – 3 Dokumente (Profil, Services, Technik), 7 Chunks, 7 Embeddings, RAG-Query getestet
 - [x] **Ingestion Workflow v5** – Batch-Embedding + Single-CTE-SQL, alle Chunks+Embeddings atomar in einer Transaktion
+- [x] **Voicebot Optimization (Option A: Quick Win)** – Swapped qwen3:1.7b → phi:latest LLM model, expected latency: 7-13s → ~5-8s
 
 ## 9. Noch nicht implementiert (Backlog)
 - n8n Voice Workflows (erweiterte Konfiguration)
