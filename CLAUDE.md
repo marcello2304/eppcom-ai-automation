@@ -94,7 +94,12 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 ## 7. Offene Tasks (Priorität nach Reihenfolge)
 
-- [ ] **Voicebot Option B (Token-Streaming)** – Enable streaming for perceived latency improvement (3-4 hours)
+- [x] **Voicebot Option B (Token-Streaming) – Task 1: Imports & Constants** ✓ DONE
+- [x] **Voicebot Option B (Token-Streaming) – Task 2: NexoStreamingAgent Implementation** ✓ DONE (Code Quality Approved)
+- [ ] **Voicebot Option B – Task 3: Update Entrypoint** (in progress)
+- [ ] **Voicebot Option B – Task 4: Local Testing**
+- [ ] **Voicebot Option B – Task 5: Deploy to Server 2**
+- [ ] **Voicebot Option B – Task 6: Performance Validation**
 - [ ] **Option C (Cartesia STT/TTS)** – Next week, 8 hours
 
 ---
@@ -129,6 +134,7 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 - [x] **LiveKit Voice-Stack** – Server 2 PostgreSQL + LiveKit Server, livekit.eppcom.de
 - [x] **voice-agent Integration** – Worker registered (AW_2WdSVfZ97bqv), Typebot Widget Voice-ready, phi:latest model
 - [x] **Traefik Routing** – livekit.eppcom.de via Traefik + Let's Encrypt
+- [x] **Voicebot Option B – Task 2: NexoStreamingAgent** – Implemented sentence-level buffering, async llm_node override, pure function tests, PEP 8 compliant (all 3 tests passing)
 
 ---
 
