@@ -96,8 +96,8 @@ Du bist Senior DevOps Architekt für Self-Hosting auf Hetzner, spezialisiert auf
 
 - [x] **Voicebot Option B (Token-Streaming) – Task 1: Imports & Constants** ✓ DONE
 - [x] **Voicebot Option B (Token-Streaming) – Task 2: NexoStreamingAgent Implementation** ✓ DONE (Code Quality Approved)
-- [ ] **Voicebot Option B – Task 3: Update Entrypoint** (in progress)
-- [ ] **Voicebot Option B – Task 4: Local Testing**
+- [x] **Voicebot Option B – Task 3: Update Entrypoint** ✓ DONE (Code Quality Approved)
+- [ ] **Voicebot Option B – Task 4: Local Testing** (in progress)
 - [ ] **Voicebot Option B – Task 5: Deploy to Server 2**
 - [ ] **Voicebot Option B – Task 6: Performance Validation**
 - [ ] **Option C (Cartesia STT/TTS)** – Next week, 8 hours
