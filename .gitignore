@@ -16,6 +16,10 @@ credentials/
 # API Keys & Tokens
 .anthropic
 .openai
+.ollama
+.typebot
+.ionos.de
+.lifekit
 .api_key*
 token.json
 
