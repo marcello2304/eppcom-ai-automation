@@ -1,0 +1,188 @@
+{
+  "name": "RAG Retrieval",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-query",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "rag-query"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst tenant_id = (body.tenant_id || '').trim();\nconst query = (body.query || '').trim();\nconst top_k = body.top_k || 3;\n\nif (!tenant_id) throw new Error('tenant_id fehlt');\nif (!query) throw new Error('query fehlt');\n\nreturn [{ json: { tenant_id, query, top_k } }];"
+      },
+      "id": "n-validate",
+      "name": "Validieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.224.54.65:11434/api/embed",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: $json.query }) }}",
+        "options": {
+          "timeout": 30000
+        }
+      },
+      "id": "n-embed-query",
+      "name": "Query Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const validated = $('Validieren').first().json;\nconst embeddingResponse = $input.first().json;\nconst embedding = embeddingResponse.embeddings[0];\nconst embeddingStr = '[' + embedding.join(',') + ']';\n\nreturn [{ json: {\n  tenant_id: validated.tenant_id,\n  query: validated.query,\n  top_k: validated.top_k,\n  embedding: embeddingStr\n}}];"
+      },
+      "id": "n-prepare-search",
+      "name": "Suche vorbereiten",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "SELECT c.content, c.chunk_index,\n       1 - (e.embedding <=> '{{ $json.embedding }}') AS similarity\nFROM embeddings e\nJOIN chunks c ON c.id = e.chunk_id\nWHERE e.tenant_id = '{{ $json.tenant_id }}'\nORDER BY e.embedding <=> '{{ $json.embedding }}'\nLIMIT {{ $json.top_k }};",
+        "options": {}
+      },
+      "id": "n-vector-search",
+      "name": "Vektorsuche",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [1080, 300],
+      "credentials": {
+        "postgres": {
+          "id": "TsyP1alpbpG1mxvi",
+          "name": "postgres-rag (app_db)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const query = $('Validieren').first().json.query;\nconst results = $input.all().map(item => item.json);\n\nif (results.length === 0) {\n  return [{ json: { query, context: '', has_context: false, prompt: query } }];\n}\n\nconst context = results\n  .map((r, i) => `[${i+1}] ${r.content}`)\n  .join('\\n\\n');\n\nconst prompt = `Du bist ein hilfreicher Assistent. Beantworte die Frage basierend auf dem folgenden Kontext. Antworte auf Deutsch. Wenn der Kontext die Frage nicht beantwortet, sage das ehrlich.\\n\\nKontext:\\n${context}\\n\\nFrage: ${query}\\n\\nAntwort:`;\n\nreturn [{ json: { query, context, has_context: true, prompt, result_count: results.length } }];"
+      },
+      "id": "n-build-prompt",
+      "name": "Prompt bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1300, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.224.54.65:11434/api/generate",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3:1.7b', prompt: $json.prompt, stream: false, options: { temperature: 0.3, num_predict: 512 } }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "n-llm",
+      "name": "Ollama LLM",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [1520, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const llmResponse = $input.first().json;\nconst promptData = $('Prompt bauen').first().json;\n\nlet answer = (llmResponse.response || '').trim();\n\n// Remove <think> blocks if present\nanswer = answer.replace(/<think>[\\s\\S]*?<\\/think>/g, '').trim();\n\nreturn [{ json: {\n  answer,\n  query: promptData.query,\n  sources_used: promptData.result_count || 0,\n  has_context: promptData.has_context\n}}];"
+      },
+      "id": "n-format-response",
+      "name": "Antwort formatieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1740, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify($json) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "n-response-ok",
+      "name": "Response OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1960, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'error', message: $input.first().json.message || 'Verarbeitungsfehler' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "n-response-error",
+      "name": "Response Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [420, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "Validieren", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validieren": {
+      "main": [
+        [{ "node": "Query Embedding", "type": "main", "index": 0 }]
+      ]
+    },
+    "Query Embedding": {
+      "main": [
+        [{ "node": "Suche vorbereiten", "type": "main", "index": 0 }]
+      ]
+    },
+    "Suche vorbereiten": {
+      "main": [
+        [{ "node": "Vektorsuche", "type": "main", "index": 0 }]
+      ]
+    },
+    "Vektorsuche": {
+      "main": [
+        [{ "node": "Prompt bauen", "type": "main", "index": 0 }]
+      ]
+    },
+    "Prompt bauen": {
+      "main": [
+        [{ "node": "Ollama LLM", "type": "main", "index": 0 }]
+      ]
+    },
+    "Ollama LLM": {
+      "main": [
+        [{ "node": "Antwort formatieren", "type": "main", "index": 0 }]
+      ]
+    },
+    "Antwort formatieren": {
+      "main": [
+        [{ "node": "Response OK", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null
+}

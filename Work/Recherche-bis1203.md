@@ -437,7 +437,7 @@ Nach erfolgreichem Setup erwartet dich:
 ✓ Test-Tenant     → angelegt
 
 Login-Daten (notieren!):
-  n8n: admin / xoOGvmyNB1lUeD5Ve17QKg
+  n8n: admin / REDACTED
 
 Sobald du die S3/SMTP/Ollama Credentials in .env eingetragen hast und auf dem Server bist, einfach /setup nochmal aufrufen — dann startet bash setup.sh durch alle 9 Phasen automatisch. Soll ich dir den SSH-Befehl zum Kopieren der .env auf den Server vorbereiten?
 wo und in welcher Form soll ich die .env erstellen?
@@ -930,10 +930,10 @@ Generated random 32-byte hexadecimal string for cryptography
 Generated random 32-byte hexadecimal string for cryptography
 
 Trag das in die .env ein:
-OLLAMA_API_KEY=c14988f47573aa994b0264e15dee08743a469ce2c36383e5653f615b1660f096
+OLLAMA_API_KEY=REDACTED
 
 Wichtig: Denselben Token musst du dann auch auf Server 2 in der Nginx-Konfiguration eintragen — in der Zeile:
-set $expected_token "Bearer c14988f47573aa994b0264e15dee08743a469ce2c36383e5653f615b1660f096";
+set $expected_token "Bearer REDACTED";
 
 Soll ich die Nginx-Config für Server 2 mit dem echten Token und der Domain eppcom.de fertig aufbereiten, sodass du sie nur noch auf Server 2 deployen musst?
 
@@ -1045,9 +1045,9 @@ S3_ACCESS_KEY (Access Key ID aus der Hetzner Console)
 S3_SECRET_KEY (Secret Access Key)
 Ich trage sie direkt in die .env ein — sie verlassen nie diese Umgebung und werden nicht committet.
 ACCESS KEY
-W2DS61S8YXCQJD1IMOZ9
+REDACTED
 SECRET KEY
-TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G
+REDACTED
 Aber Aufzeichnungen über den Key hier löschen damit er sicher weiter genutzt werden kann
 
 
@@ -1064,7 +1064,7 @@ IONOS steht,
 
 
 Gib mir das Ionos-Passwort und ich trage es sofort ein:
-IONOS eppler@eppcom.de passworrt: 85234Marci!
+IONOS eppler@eppcom.de passworrt: REDACTED
 
 
 Updated SMTP password in environment configuration file
@@ -1153,22 +1153,22 @@ ADMIN_IP=94.130.170.167
 ACME_EMAIL=eppler@eppcom.de
 TZ=Europe/Berlin
 
-POSTGRES_PASSWORD=MXeuHHCnuYDCa88ly3sEGl6agCK8f5UUSdKES8cD
+POSTGRES_PASSWORD=REDACTED
 POSTGRES_USER=postgres
 POSTGRES_DB=app_db
 POSTGRES_CONTAINER=postgres-rag
 
-N8N_ENCRYPTION_KEY=dc659d5540d97737cf74f2ef1388e4a7
+N8N_ENCRYPTION_KEY=REDACTED
 N8N_ADMIN_USER=admin
-N8N_ADMIN_PASSWORD=xoOGvmyNB1lUeD5Ve17QKg
+N8N_ADMIN_PASSWORD=REDACTED
 N8N_WEBHOOK_URL=https://n8n.eppcom.de
 
-TYPEBOT_SECRET=6469cf8d4804942a7f60f4855d30b7d0
+TYPEBOT_SECRET=REDACTED
 NEXTAUTH_URL=https://builder.eppcom.de
 NEXT_PUBLIC_VIEWER_URL=https://bot.eppcom.de
 
-S3_ACCESS_KEY=W2DS61S8YXCQJD1IMOZ9
-S3_SECRET_KEY=TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G
+S3_ACCESS_KEY=REDACTED
+S3_SECRET_KEY=REDACTED
 S3_BUCKET=typebot-assets
 S3_REGION=eu-central-003
 S3_ENDPOINT=https://nbg1.your-objectstorage.com
@@ -1176,12 +1176,12 @@ S3_BACKUP_BUCKET=rag-backups
 S3_BACKUP_ENDPOINT=https://nbg1.your-objectstorage.com
 
 OLLAMA_BASE_URL=https://ollama.eppcom.de
-OLLAMA_API_KEY=c14988f47573aa994b0264e15dee08743a469ce2c36383e5653f615b1660f096
+OLLAMA_API_KEY=REDACTED
 
 SMTP_HOST=smtp.ionos.de
 SMTP_PORT=587
 SMTP_USER=eppler@eppcom.de
-SMTP_PASSWORD=85234Marci!
+SMTP_PASSWORD=REDACTED
 SMTP_FROM=eppler@eppcom.de
 
 BACKUP_DIR=/opt/backups/postgres
@@ -1199,7 +1199,7 @@ image.png
 Mein Passwort funktioniert hier nicht, obwohl ich damit noch als Root auf dem Server einloggen kann?
 
 
-Das IONOS-Passwort (85234Marci!) ist dein E-Mail-Passwort — nicht das Root-Passwort deines Hetzner-Servers. Die sind unterschiedlich.
+Das IONOS-Passwort (REDACTED) ist dein E-Mail-Passwort — nicht das Root-Passwort deines Hetzner-Servers. Die sind unterschiedlich.
 Mögliche Ursachen:
 Du nutzt normalerweise SSH-Keys (kein Passwort-Login nötig) — prüfe ob du einen Key hast:
 ls ~/.ssh/id_*
@@ -1246,30 +1246,30 @@ DOMAIN=eppcom.de
 ADMIN_IP=94.130.170.167
 ACME_EMAIL=eppler@eppcom.de
 TZ=Europe/Berlin
-POSTGRES_PASSWORD=MXeuHHCnuYDCa88ly3sEGl6agCK8f5UUSdKES8cD
+POSTGRES_PASSWORD=REDACTED
 POSTGRES_USER=postgres
 POSTGRES_DB=app_db
 POSTGRES_CONTAINER=postgres-rag
-N8N_ENCRYPTION_KEY=dc659d5540d97737cf74f2ef1388e4a7
+N8N_ENCRYPTION_KEY=REDACTED
 N8N_ADMIN_USER=admin
-N8N_ADMIN_PASSWORD=xoOGvmyNB1lUeD5Ve17QKg
+N8N_ADMIN_PASSWORD=REDACTED
 N8N_WEBHOOK_URL=https://n8n.eppcom.de
-TYPEBOT_SECRET=6469cf8d4804942a7f60f4855d30b7d0
+TYPEBOT_SECRET=REDACTED
 NEXTAUTH_URL=https://builder.eppcom.de
 NEXT_PUBLIC_VIEWER_URL=https://bot.eppcom.de
-S3_ACCESS_KEY=W2DS61S8YXCQJD1IMOZ9
-S3_SECRET_KEY=TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G
+S3_ACCESS_KEY=REDACTED
+S3_SECRET_KEY=REDACTED
 S3_BUCKET=typebot-assets
 S3_REGION=eu-central-003
 S3_ENDPOINT=https://nbg1.your-objectstorage.com
 S3_BACKUP_BUCKET=rag-backups
 S3_BACKUP_ENDPOINT=https://nbg1.your-objectstorage.com
 OLLAMA_BASE_URL=https://ollama.eppcom.de
-OLLAMA_API_KEY=c14988f47573aa994b0264e15dee08743a469ce2c36383e5653f615b1660f096
+OLLAMA_API_KEY=REDACTED
 SMTP_HOST=smtp.ionos.de
 SMTP_PORT=587
 SMTP_USER=eppler@eppcom.de
-SMTP_PASSWORD=85234Marci!
+SMTP_PASSWORD=REDACTED
 SMTP_FROM=eppler@eppcom.de
 BACKUP_DIR=/opt/backups/postgres
 RETENTION_DAYS=30
@@ -1289,10 +1289,10 @@ image.png
 Das Problem ist das | im S3 Secret Key — Bash interpretiert es als Pipe-Zeichen.
 Fix direkt auf dem Server:
 # Den S3_SECRET_KEY mit Anführungszeichen umschließen:
-sed -i 's|S3_SECRET_KEY=TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G|S3_SECRET_KEY="TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G"|' /opt/rag-platform/.env
+sed -i 's|S3_SECRET_KEY=REDACTED|S3_SECRET_KEY="REDACTED"|' /opt/rag-platform/.env
 
 Oder einfacher — direkt die Zeile ersetzen:
-sed -i 's/^S3_SECRET_KEY=.*/S3_SECRET_KEY="TFvEUmSyhfMzrSser4xfZiXRz9ulmdZ8AIGg|z5G"/' /opt/rag-platform/.env
+sed -i 's/^S3_SECRET_KEY=.*/S3_SECRET_KEY="REDACTED"/' /opt/rag-platform/.env
 
 # Prüfen:
 grep S3_SECRET_KEY .env
@@ -1545,7 +1545,7 @@ HOSTNAME=c5b0da217ba1
 NEXTAUTH_URL=https://admin-bot.eppcom.de
 SMTP_HOST=smtp.ionos.de
 NEXT_PUBLIC_VIEWER_URL=https://bot.eppcom.de
-DATABASE_URL=postgresql://appuser:aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa@postgres:5432/typebot?schema=public
+DATABASE_URL=postgresql://appuser:REDACTED@postgres:5432/typebot?schema=public
 COOLIFY_URL=https://admin-bot.eppcom.de
 S3_PORT=443
 SMTP_PORT=587
@@ -2856,7 +2856,7 @@ Tenant-UUID → steht in sql/eppcom-fix-apikey.sql
 API-Key → eppcom-test-key-2025 (aus Typebot-Config)
 PHASE 4 — n8n konfigurieren
 4.1 — n8n öffnen: https://n8n.eppcom.de
-Login: admin / xoOGvmyNB1lUeD5Ve17QKg
+Login: admin / REDACTED
 4.2 — PostgreSQL Credential anlegen:
 Settings → Credentials → New Credential → PostgreSQL
 Feld	Wert
@@ -2865,7 +2865,7 @@ Host	postgres-rag
 Port	5432
 Database	app_db
 User	postgres
-Password	MXeuHHCnuYDCa88ly3sEGl6agCK8f5UUSdKES8cD
+Password	REDACTED
 4.3 — Workflows importieren:
 Workflows → Import from File → je einmal:
 n8n/eppcom-rag-chat-workflow.json
@@ -3165,7 +3165,7 @@ HOSTNAME=c5b0da217ba1
 NEXTAUTH_URL=https://admin-bot.eppcom.de
 SMTP_HOST=smtp.ionos.de
 NEXT_PUBLIC_VIEWER_URL=https://bot.eppcom.de
-DATABASE_URL=postgresql://appuser:aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa@postgres:5432/typebot?schema=public
+DATABASE_URL=postgresql://appuser:REDACTED@postgres:5432/typebot?schema=public
 COOLIFY_URL=https://admin-bot.eppcom.de
 S3_PORT=443
 SMTP_PORT=587
@@ -3381,7 +3381,7 @@ HOSTNAME=c5b0da217ba1
 NEXTAUTH_URL=https://admin-bot.eppcom.de
 SMTP_HOST=smtp.ionos.de
 NEXT_PUBLIC_VIEWER_URL=https://bot.eppcom.de
-DATABASE_URL=postgresql://appuser:aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa@postgres:5432/typebot?schema=public
+DATABASE_URL=postgresql://appuser:REDACTED@postgres:5432/typebot?schema=public
 COOLIFY_URL=https://admin-bot.eppcom.de
 S3_PORT=443
 SMTP_PORT=587
@@ -3703,7 +3703,7 @@ API-Key: | b0000000-...                         | EPPCOM Produk... | ...  | true
 n8n Login
 URL: https://workflows.eppcom.de
 E-Mail: eppler@eppcom.de
-Passwort: xoOGvmyNB1lUeD5Ve17QKg
+Passwort: REDACTED
 Falls das nicht klappt: Öffne Coolify → deine n8n App → Environment Variables → schau ob N8N_ADMIN_EMAIL gesetzt ist. Falls gar nichts geht: in Coolify bei n8n auf "Restart" klicken — beim ersten Start nach einem Restart fragt n8n erneut nach einem Owner-Account.
 Nach dem Login — n8n konfigurieren
 1. PostgreSQL Credential anlegen (Settings → Credentials → New):
@@ -3712,7 +3712,7 @@ Name	Postgres account ← exakt so!
 Host	postgres-rag
 Database	app_db
 User	postgres
-Password	MXeuHHCnuYDCa88ly3sEGl6agCK8f5UUSdKES8cD
+Password	REDACTED
 2. Beide Workflows importieren (Workflows → Import from File):
 n8n/eppcom-ingestion-workflow.json
 n8n/eppcom-rag-chat-workflow.json
@@ -3724,22 +3724,22 @@ Typebot erwartet ebenfalls eine E-Mail (Magic Link per E-Mail). Gib eppler@eppco
 Deine Sitzung initialisiert
 Deine Sitzung initialisiert
 Ich kann mich noch nicht in n8n einloggen, in den EVs im automation stack steht nur:
-POSTGRES_PASSWORD=aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa
-ENCRYPTION_SECRET=b9d2df4685882573755aa67b47af9dc3
-NEXTAUTH_SECRET=55f9f717f3e2c2258b2a2e7976598b95
+POSTGRES_PASSWORD=REDACTED
+ENCRYPTION_SECRET=REDACTED
+NEXTAUTH_SECRET=REDACTED
 ADMIN_EMAIL=eppler@eppcom.de
 SMTP_USERNAME=eppler@eppcom.de
-SMTP_PASSWORD=85234Marci!
+SMTP_PASSWORD=REDACTED
 SMTP_FROM=eppler@eppcom.de
 S3_ENDPOINT=nbg1.your-objectstorage.com
-S3_ACCESS_KEY=N1QB20SZDX5ICWQ2VAKR
-S3_SECRET_KEY=BhJHSmMn4tX4bQQijgZph8Lv5cDtM3osbCXglfvn
+S3_ACCESS_KEY=REDACTED
+S3_SECRET_KEY=REDACTED
 S3_BUCKET=typebot-assets
 S3_REGION=nbg1
 
 [Request interrupted by user]
 
-Ich kann mich noch nicht in n8n einloggen, nichts der folgenden Daten auf Git deployen und in den EVs im automation stack steht nur:POSTGRES_PASSWORD=aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faaENCRYPTION_SECRET=b9d2df4685882573755aa67b47af9dc3NEXTAUTH_SECRET=55f9f717f3e2c2258b2a2e7976598b95ADMIN_EMAIL=__eppler@eppcom.de__SMTP_USERNAME=__eppler@eppcom.de__SMTP_PASSWORD=85234Marci!SMTP_FROM=__eppler@eppcom.de__S3_ENDPOINT=nbg1.your-objectstorage.comS3_ACCESS_KEY=N1QB20SZDX5ICWQ2VAKRS3_SECRET_KEY=BhJHSmMn4tX4bQQijgZph8Lv5cDtM3osbCXglfvnS3_BUCKET=typebot-assetsS3_REGION=nbg1
+Ich kann mich noch nicht in n8n einloggen, nichts der folgenden Daten auf Git deployen und in den EVs im automation stack steht nur:POSTGRES_PASSWORD=REDACTEDENCRYPTION_SECRET=REDACTEDNEXTAUTH_SECRET=REDACTEDADMIN_EMAIL=__eppler@eppcom.de__SMTP_USERNAME=__eppler@eppcom.de__SMTP_PASSWORD=REDACTEDSMTP_FROM=__eppler@eppcom.de__S3_ENDPOINT=nbg1.your-objectstorage.comS3_ACCESS_KEY=REDACTEDS3_SECRET_KEY=REDACTEDS3_BUCKET=typebot-assetsS3_REGION=nbg1
 
 
 Verstanden — keine Credentials in Git. Das ist richtig so.
@@ -4016,18 +4016,18 @@ root@workflows:/# docker exec postgres-zoc8g4socc0ww80w4s080g4s psql -U appuser 
 root@workflows:/# docker exec postgres-zoc8g4socc0ww80w4s080g4s psql -U appuser -d n8n
   -c "UPDATE "user" SET password = crypt('NeuesPasswort123!', gen_salt('bf')) WHERE email = 'eppler@eppcom.de';"
 -bash: !',: event not found
-85234Marci!
-psql: warning: extra command-line argument "85234Marci!" ignored
+REDACTED
+psql: warning: extra command-line argument "REDACTED" ignored
 root@workflows:/# bash scripts/create-tenant.sh test-tenant "Test Kunde" test@test.de
 bash: scripts/create-tenant.sh: No such file or directory
 root@workflows:/# docker exec -e PGPASSWORD=<PASS> postgres-rag
   psql -U postgres -d app_db -c
   "SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY 1;"
 -bash: PASS: No such file or directory
-root@workflows:/# docker exec -e PGPASSWORD=<aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa> postgres-rag \
+root@workflows:/# docker exec -e PGPASSWORD=<REDACTED> postgres-rag \
   psql -U postgres -d app_db -c \
   "SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY 1;"
--bash: aab1f390dbfe72e0d2622df1256ad294a7f0b51ef2c87faa: No such file or directory
+-bash: REDACTED: No such file or directory
 /usr/lib/postgresql/16/bin/psql: option requires an argument -- 'c'
 psql: hint: Try "psql --help" for more information.
 SELECT table_name FROM information_schema.tables WHERE table_schema='public' ORDER BY 1;: command not found

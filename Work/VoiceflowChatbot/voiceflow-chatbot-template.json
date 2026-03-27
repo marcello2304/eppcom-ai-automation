@@ -389,6 +389,33 @@
           }
         },
         {
+          "id": "blk-aa-ollama",
+          "groupId": "grp-ai-answer",
+          "type": "Webhook",
+          "options": {
+            "webhook": {
+              "id": "wh-ollama-chat",
+              "url": "http://46.224.54.65:11434/api/chat",
+              "method": "POST",
+              "headers": [
+                { "id": "hdr-ct-ollama", "key": "Content-Type", "value": "application/json" }
+              ],
+              "queryParams": [],
+              "body": "{\"model\":\"qwen3:1.7b\",\"stream\":false,\"messages\":[{\"role\":\"system\",\"content\":\"Du bist der freundliche KI-Assistent von EPPCOM Solutions (eppcom.de) in Reutlingen. Inhaber ist Marcel Eppler. EPPCOM ist spezialisiert auf KI-Automatisierung fuer KMU.\\n\\nServices:\\n- Workflow-Automatisierung ab 158 EUR\\/Monat, Setup ab 1.900 EUR\\n- KI-Chatbots ab 133 EUR\\/Monat, Setup ab 1.600 EUR\\n- KI-Strategie & Schulungen ab 1.290 EUR\\n- KI-Webdesign & Marketing ab 150 EUR\\/Monat, Setup ab 1.500 EUR\\n\\nWichtige Fakten:\\n- Bis zu 50% staatliche Foerderung moeglich\\n- DSGVO-konform, vollstaendig selbst gehostet, keine Datenweitergabe\\n- Erste Automatisierungen in 2-4 Wochen\\n- Bis zu 60% weniger Bueroarbeit\\n- Kostenlose Erstberatung (30 Min.)\\n- Kontakt: kontakt@eppcom.de, Tel. +49 157 53640191\\n\\nAntworte immer auf Deutsch, freundlich und kompetent. Max. 3-4 Saetze. Bei konkreten Projektanfragen empfiehl die kostenlose Erstberatung.\"},{\"role\":\"user\",\"content\":\"{{frage}}\"}]}"
+            },
+            "responseVariableMapping": [
+              {
+                "id": "rvm-ai-antwort",
+                "bodyPath": "message.content",
+                "variableId": "var-ai-antwort"
+              }
+            ],
+            "isAdvancedConfig": true,
+            "isCustomBody": true,
+            "isExecutedOnClient": false
+          }
+        },
+        {
           "id": "blk-aa2",
           "groupId": "grp-ai-answer",
           "type": "text",
@@ -512,6 +539,34 @@
           }
         },
         {
+          "id": "blk-c2b",
+          "groupId": "grp-contact",
+          "type": "text",
+          "content": {
+            "richText": [
+              {
+                "type": "p",
+                "children": [
+                  { "text": "Ihre Telefonnummer (optional, für schnelleren Rückruf):" }
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "id": "blk-c2c",
+          "groupId": "grp-contact",
+          "type": "text input",
+          "options": {
+            "labels": {
+              "placeholder": "+49 157 ...",
+              "button": "Weiter"
+            },
+            "variableId": "var-phone",
+            "isLong": false
+          }
+        },
+        {
           "id": "blk-c3",
           "groupId": "grp-contact",
           "type": "text",
@@ -537,6 +592,27 @@
             },
             "variableId": "var-message",
             "isLong": true
+          }
+        },
+        {
+          "id": "blk-c4b",
+          "groupId": "grp-contact",
+          "type": "Webhook",
+          "options": {
+            "webhook": {
+              "id": "wh-n8n-lead",
+              "url": "https://workflows.eppcom.de/webhook/ingest",
+              "method": "POST",
+              "headers": [
+                { "id": "hdr-ct-n8n", "key": "Content-Type", "value": "application/json" }
+              ],
+              "queryParams": [],
+              "body": "{\"name\":\"{{name}}\",\"email\":\"{{email}}\",\"telefon\":\"{{telefon}}\",\"nachricht\":\"{{nachricht}}\",\"quelle\":\"Typebot-Chatbot\",\"datum\":\"{{sys:now}}\"}"
+            },
+            "responseVariableMapping": [],
+            "isAdvancedConfig": true,
+            "isCustomBody": true,
+            "isExecutedOnClient": false
           }
         },
         {
@@ -798,6 +874,11 @@
     {
       "id": "var-frage",
       "name": "frage",
+      "isSessionVariable": true
+    },
+    {
+      "id": "var-phone",
+      "name": "telefon",
       "isSessionVariable": true
     },
     {

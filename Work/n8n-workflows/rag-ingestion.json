@@ -1,0 +1,151 @@
+{
+  "name": "RAG Document Ingestion",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "rag-ingest",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "id": "n-webhook",
+      "name": "Webhook",
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [200, 300],
+      "webhookId": "rag-ingest"
+    },
+    {
+      "parameters": {
+        "jsCode": "const body = $input.first().json.body || $input.first().json;\n\nconst tenant_id = (body.tenant_id || '').trim();\nconst text = (body.text || '').trim();\nconst source_name = (body.source_name || 'Unbenannt').trim();\nconst source_type = (body.source_type || 'manual').trim();\n\nif (!tenant_id) throw new Error('tenant_id fehlt');\nif (!text) throw new Error('text fehlt');\nif (text.length < 10) throw new Error('Text zu kurz (min. 10 Zeichen)');\n\nreturn [{ json: { tenant_id, text, source_name, source_type } }];"
+      },
+      "id": "n-validate",
+      "name": "Validieren",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [420, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const input = $input.first().json;\nconst text = input.text;\n\nconst MAX_CHUNK_SIZE = 500;\nconst chunks = [];\nlet remaining = text;\n\nwhile (remaining.length > 0) {\n  let end = Math.min(remaining.length, MAX_CHUNK_SIZE);\n  if (end < remaining.length) {\n    const lastPeriod = remaining.lastIndexOf('.', end);\n    const lastNewline = remaining.lastIndexOf('\\n', end);\n    const splitAt = Math.max(lastPeriod, lastNewline);\n    if (splitAt > MAX_CHUNK_SIZE * 0.3) {\n      end = splitAt + 1;\n    }\n  }\n  const chunk = remaining.substring(0, end).trim();\n  if (chunk.length > 0) chunks.push(chunk);\n  remaining = remaining.substring(end).trim();\n}\n\nreturn [{ json: { ...input, chunks } }];"
+      },
+      "id": "n-chunk",
+      "name": "Text Chunking",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [640, 300]
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "http://46.224.54.65:11434/api/embed",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify({ model: 'qwen3-embedding:0.6b', input: $json.chunks }) }}",
+        "options": {
+          "timeout": 60000
+        }
+      },
+      "id": "n-batch-embed",
+      "name": "Batch Embedding",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [860, 300]
+    },
+    {
+      "parameters": {
+        "jsCode": "const validated = $('Text Chunking').first().json;\nconst embedResponse = $input.first().json;\nconst chunks = validated.chunks;\nconst embeddings = embedResponse.embeddings;\nconst tenant_id = validated.tenant_id;\nconst text = validated.text;\nconst source_name = validated.source_name;\nconst source_type = validated.source_type;\n\nconst esc = (s) => s.replace(/'/g, \"''\");\n\nconst chunkVals = chunks.map((c, i) =>\n  `((SELECT id FROM new_doc), '${tenant_id}', '${esc(c)}', ${i}, ${Math.ceil(c.length / 4)})`\n).join(',\\n  ');\n\nconst embVals = embeddings.map((emb, i) => {\n  const embStr = '[' + emb.join(',') + ']';\n  return `((SELECT id FROM new_chunks WHERE chunk_index = ${i}), '${tenant_id}', '${embStr}')`;\n}).join(',\\n  ');\n\nconst sql = `WITH new_source AS (\n  INSERT INTO sources (tenant_id, name, source_type, status)\n  VALUES ('${tenant_id}', '${esc(source_name)}', '${source_type}', 'completed')\n  RETURNING id\n),\nnew_doc AS (\n  INSERT INTO documents (source_id, tenant_id, content)\n  SELECT id, '${tenant_id}', '${esc(text)}' FROM new_source\n  RETURNING id, source_id\n),\nnew_chunks AS (\n  INSERT INTO chunks (document_id, tenant_id, content, chunk_index, token_count)\n  VALUES ${chunkVals}\n  RETURNING id, chunk_index\n),\nnew_embeddings AS (\n  INSERT INTO embeddings (chunk_id, tenant_id, embedding)\n  VALUES ${embVals}\n)\nSELECT source_id, id AS document_id FROM new_doc`;\n\nreturn [{ json: { sql, chunk_count: chunks.length } }];"
+      },
+      "id": "n-build-sql",
+      "name": "SQL bauen",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [1080, 300]
+    },
+    {
+      "parameters": {
+        "operation": "executeQuery",
+        "query": "{{ $json.sql }}",
+        "options": {}
+      },
+      "id": "n-execute-sql",
+      "name": "Alles speichern",
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.5,
+      "position": [1300, 300],
+      "credentials": {
+        "postgres": {
+          "id": "TsyP1alpbpG1mxvi",
+          "name": "postgres-rag (app_db)"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'ok', message: 'Dokument verarbeitet', source_id: $json.source_id, document_id: $json.document_id, chunks_created: $('SQL bauen').first().json.chunk_count }) }}",
+        "options": {
+          "responseCode": 200
+        }
+      },
+      "id": "n-response-ok",
+      "name": "Response OK",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [1520, 300]
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={{ JSON.stringify({ status: 'error', message: $input.first().json.message || 'Verarbeitungsfehler' }) }}",
+        "options": {
+          "responseCode": 400
+        }
+      },
+      "id": "n-response-error",
+      "name": "Response Error",
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [420, 500]
+    }
+  ],
+  "connections": {
+    "Webhook": {
+      "main": [
+        [{ "node": "Validieren", "type": "main", "index": 0 }]
+      ]
+    },
+    "Validieren": {
+      "main": [
+        [{ "node": "Text Chunking", "type": "main", "index": 0 }]
+      ]
+    },
+    "Text Chunking": {
+      "main": [
+        [{ "node": "Batch Embedding", "type": "main", "index": 0 }]
+      ]
+    },
+    "Batch Embedding": {
+      "main": [
+        [{ "node": "SQL bauen", "type": "main", "index": 0 }]
+      ]
+    },
+    "SQL bauen": {
+      "main": [
+        [{ "node": "Alles speichern", "type": "main", "index": 0 }]
+      ]
+    },
+    "Alles speichern": {
+      "main": [
+        [{ "node": "Response OK", "type": "main", "index": 0 }]
+      ]
+    }
+  },
+  "settings": {
+    "executionOrder": "v1",
+    "saveManualExecutions": true,
+    "callerPolicy": "workflowsFromSameOwner",
+    "errorWorkflow": ""
+  },
+  "staticData": null
+}
